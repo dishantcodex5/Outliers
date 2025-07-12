@@ -277,31 +277,53 @@ export default function Profile() {
           </Card>
 
           {/* Main Content Tabs */}
-          <Tabs defaultValue="skills" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-gray-800/50 border border-gray-600">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
+            <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 border border-gray-600">
+              <TabsTrigger
+                value="overview"
+                className="data-[state=active]:bg-primary"
+              >
+                <BarChart3 className="w-4 h-4 mr-1" />
+                Overview
+              </TabsTrigger>
               <TabsTrigger
                 value="skills"
                 className="data-[state=active]:bg-primary"
               >
-                My Skills
+                <BookOpen className="w-4 h-4 mr-1" />
+                Skills
               </TabsTrigger>
               <TabsTrigger
                 value="activity"
                 className="data-[state=active]:bg-primary"
               >
+                <Clock className="w-4 h-4 mr-1" />
                 Activity
               </TabsTrigger>
               <TabsTrigger
                 value="achievements"
                 className="data-[state=active]:bg-primary"
               >
+                <Trophy className="w-4 h-4 mr-1" />
                 Achievements
               </TabsTrigger>
               <TabsTrigger
-                value="stats"
+                value="messages"
                 className="data-[state=active]:bg-primary"
               >
-                Statistics
+                <MessageCircle className="w-4 h-4 mr-1" />
+                Messages
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="data-[state=active]:bg-primary"
+              >
+                <Settings className="w-4 h-4 mr-1" />
+                Settings
               </TabsTrigger>
             </TabsList>
 
