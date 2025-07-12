@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StarBorder from "@/components/ui/StarBorder";
+import SkillsManager from "@/components/SkillsManager";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   User,
@@ -21,7 +23,7 @@ import {
   Shield,
   Eye,
   EyeOff,
-  Globe,
+  Plus,
 } from "lucide-react";
 
 // Mock additional data not in user schema
