@@ -647,6 +647,9 @@ export default function Requests() {
             onOpenChange={() => setSelectedChat(null)}
           >
             <DialogContent className="bg-transparent border-none p-0 max-w-4xl">
+              <DialogHeader className="sr-only">
+                <DialogTitle>Chat with Exchange Partner</DialogTitle>
+              </DialogHeader>
               <ChatInterface
                 currentUser={{
                   id: user.id,
