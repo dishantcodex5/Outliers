@@ -17,6 +17,7 @@ export interface ChromaItem {
   skillsOffered?: string[];
   skillsWanted?: string[];
   availability?: string;
+  onClick?: () => void;
 }
 
 export interface ChromaGridProps {
