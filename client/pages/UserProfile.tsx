@@ -80,6 +80,7 @@ export default function UserProfile() {
     duration: "1 hour",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async (retryCount = 0) => {
