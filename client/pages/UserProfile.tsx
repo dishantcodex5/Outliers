@@ -155,15 +155,21 @@ export default function UserProfile() {
 
     try {
       setIsSubmitting(true);
+      setRequestError(null); // Clear any previous request errors
+
       const authData = JSON.parse(
         localStorage.getItem("skillswap_auth") || "{}",
       );
       const token = authData.token;
 
       if (!token) {
-        setError("Please log in to send requests");
+        setRequestError("Please log in to send requests");
         return;
       }
+
+      // Add timeout for the request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       const response = await fetch("/api/requests", {
         method: "POST",
@@ -178,19 +184,43 @@ export default function UserProfile() {
           message: requestForm.message,
           duration: requestForm.duration,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         let errorMessage = "Failed to send request";
+
+        // Handle different status codes
+        if (response.status === 400) {
+          errorMessage = "Invalid request data. Please check your selections.";
+        } else if (response.status === 401) {
+          errorMessage = "Authentication failed. Please log in again.";
+        } else if (response.status === 403) {
+          errorMessage = "You don't have permission to send this request.";
+        } else if (response.status === 429) {
+          errorMessage =
+            "Too many requests. Please wait a moment and try again.";
+        } else if (response.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
         } catch (jsonError) {
-          // If we can't parse the error response as JSON, use the status text
-          errorMessage = response.statusText || errorMessage;
+          // If we can't parse the error response as JSON, keep our default message
+          console.warn("Could not parse error response as JSON:", jsonError);
         }
+
         throw new Error(errorMessage);
       }
+
+      const result = await response.json();
+      console.log("Request sent successfully:", result);
 
       setShowRequestDialog(false);
       setRequestForm({
@@ -199,11 +229,25 @@ export default function UserProfile() {
         message: "",
         duration: "1 hour",
       });
+      setRequestError(null);
+
       // Show success message (would be a toast in real app)
       alert("Request sent successfully!");
     } catch (err: any) {
-      setError(err.message || "Failed to send request");
       console.error("Failed to send request:", err);
+
+      // Handle different types of errors
+      if (err.name === "AbortError") {
+        setRequestError("Request timed out. Please try again.");
+      } else if (err.message === "Failed to fetch") {
+        setRequestError(
+          "Unable to connect to server. Please check your internet connection and try again.",
+        );
+      } else {
+        setRequestError(
+          err.message || "Failed to send request. Please try again.",
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
