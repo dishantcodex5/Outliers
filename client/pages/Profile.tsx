@@ -417,13 +417,10 @@ export default function Profile() {
                     Profile Completeness
                   </span>
                   <span className="text-primary font-semibold">
-                    {mockStats.profileCompleteness}%
+                    {stats.profileCompleteness}%
                   </span>
                 </div>
-                <Progress
-                  value={mockStats.profileCompleteness}
-                  className="h-2"
-                />
+                <Progress value={stats.profileCompleteness} className="h-2" />
                 <p className="text-sm text-gray-400 mt-2">
                   {user.skillsOffered.length === 0 &&
                     "Add skills you can teach. "}
