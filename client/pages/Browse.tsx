@@ -114,12 +114,30 @@ export default function Browse() {
         const response = await fetch(`/api/users?${params.toString()}`, {
           headers,
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
+
+        // Check for HTML responses (API routing issues)
+        const responseText = await response.text();
+        if (responseText.startsWith("<!DOCTYPE")) {
+          throw new Error(
+            "Users API endpoint not found. Please check server configuration.",
+          );
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch users: ${response.status} ${response.statusText}`,
+          );
+        }
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          throw new Error("Invalid response format from server");
+        }
+
         setUsers(data.users || []);
+        setError(null); // Clear any previous errors
       } catch (err: any) {
         setError(err.message || "Failed to load users");
         console.error("Failed to fetch users:", err);
