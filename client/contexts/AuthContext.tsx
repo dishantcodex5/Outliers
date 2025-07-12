@@ -154,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .map((n) => n[0])
         .join("")
         .toUpperCase(),
+      profileCompleted: false, // New users need to complete profile
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
