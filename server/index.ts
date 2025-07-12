@@ -14,6 +14,7 @@ export function createServer() {
   // Connect to database
   connectDatabase().catch((error) => {
     console.error("Failed to connect to database:", error);
+    // Continue running server even if database connection fails in development
   });
 
   // Middleware
