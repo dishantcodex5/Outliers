@@ -91,6 +91,116 @@ export default function Browse() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [isOffline, setIsOffline] = useState(false);
+
+  // Fallback users for when API is completely unavailable
+  const fallbackUsers: User[] = [
+    {
+      _id: "fallback-user-1",
+      name: "Sarah Johnson",
+      email: "sarah@example.com",
+      location: "San Francisco, CA",
+      profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah`,
+      skillsOffered: [
+        {
+          skill: "React Development",
+          description: "Advanced React patterns and hooks",
+          isApproved: true,
+        },
+        {
+          skill: "UI/UX Design",
+          description: "User interface and experience design",
+          isApproved: true,
+        },
+      ],
+      skillsWanted: [
+        {
+          skill: "Photography",
+          description: "Portrait and landscape photography",
+        },
+        { skill: "Spanish Language", description: "Conversational Spanish" },
+      ],
+      availability: {
+        weekdays: true,
+        weekends: false,
+        mornings: false,
+        afternoons: true,
+        evenings: true,
+      },
+      isPublic: true,
+      profileCompleted: true,
+    },
+    {
+      _id: "fallback-user-2",
+      name: "Mike Chen",
+      email: "mike@example.com",
+      location: "New York, NY",
+      profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Mike`,
+      skillsOffered: [
+        {
+          skill: "Photography",
+          description: "Professional photography and editing",
+          isApproved: true,
+        },
+        {
+          skill: "Guitar",
+          description: "Acoustic and electric guitar lessons",
+          isApproved: true,
+        },
+      ],
+      skillsWanted: [
+        { skill: "Web Development", description: "Full-stack web development" },
+        {
+          skill: "Digital Marketing",
+          description: "Social media and content marketing",
+        },
+      ],
+      availability: {
+        weekdays: false,
+        weekends: true,
+        mornings: true,
+        afternoons: false,
+        evenings: true,
+      },
+      isPublic: true,
+      profileCompleted: true,
+    },
+    {
+      _id: "fallback-user-3",
+      name: "Emma Rodriguez",
+      email: "emma@example.com",
+      location: "Austin, TX",
+      profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Emma`,
+      skillsOffered: [
+        {
+          skill: "Spanish Language",
+          description: "Native Spanish speaker and tutor",
+          isApproved: true,
+        },
+        {
+          skill: "Cooking",
+          description: "Traditional and modern cuisine",
+          isApproved: true,
+        },
+      ],
+      skillsWanted: [
+        {
+          skill: "Programming",
+          description: "Python and JavaScript programming",
+        },
+        { skill: "Graphic Design", description: "Logo and brand design" },
+      ],
+      availability: {
+        weekdays: true,
+        weekends: true,
+        mornings: true,
+        afternoons: false,
+        evenings: false,
+      },
+      isPublic: true,
+      profileCompleted: true,
+    },
+  ];
 
   // Fetch users from API
   useEffect(() => {
