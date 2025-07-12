@@ -271,9 +271,12 @@ export default function Requests() {
             <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-400 mb-1">
-                  {requests.scheduled.length}
+                  {
+                    requests.incoming.filter((r) => r.status === "accepted")
+                      .length
+                  }
                 </div>
-                <p className="text-sm text-gray-400">Active Sessions</p>
+                <p className="text-sm text-gray-400">Accepted Requests</p>
               </CardContent>
             </Card>
             <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
