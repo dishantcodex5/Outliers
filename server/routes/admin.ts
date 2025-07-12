@@ -240,10 +240,44 @@ router.get(
   "/activity",
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: any, res: Response) => {
     try {
       const { limit = 10 } = req.query;
       const limitNum = parseInt(limit as string);
+
+      // Development mode without database - return mock activity
+      if (req.noDatabaseConnection) {
+        const mockActivity = [
+          {
+            type: "user_joined",
+            description: "John Doe joined the platform",
+            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+            user: "John Doe",
+          },
+          {
+            type: "request_created",
+            description:
+              "Jane Smith sent a skill exchange request to Mike Johnson",
+            timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
+            status: "pending",
+          },
+          {
+            type: "user_joined",
+            description: "Sarah Wilson joined the platform",
+            timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+            user: "Sarah Wilson",
+          },
+          {
+            type: "request_created",
+            description:
+              "Alex Chen sent a skill exchange request to Emma Brown",
+            timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
+            status: "accepted",
+          },
+        ];
+
+        return res.json({ activity: mockActivity.slice(0, limitNum) });
+      }
 
       // Get recent users
       const recentUsers = await User.find()
