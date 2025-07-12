@@ -831,7 +831,8 @@ export default function Admin() {
                             {skill.description}
                           </p>
                           <p className="text-gray-400 text-xs">
-                            Submitted by: {skill.user.name} ({skill.user.email})
+                            Submitted by: {skill.user?.name || "Unknown"} (
+                            {skill.user?.email || "Unknown"})
                           </p>
                           <p className="text-gray-500 text-xs">
                             {new Date(skill.createdAt).toLocaleString()}
@@ -899,7 +900,8 @@ export default function Admin() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <h4 className="text-white font-medium">
-                              {swap.from.name} → {swap.to.name}
+                              {swap.from?.name || "Unknown"} →{" "}
+                              {swap.to?.name || "Unknown"}
                             </h4>
                             <Badge
                               className={
