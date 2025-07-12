@@ -646,11 +646,13 @@ export default function Admin() {
                               )}
                             </div>
                             <div className="text-sm text-gray-400">
-                              {user.email}
+                              {user.email || "No email"}
                             </div>
                             <div className="text-xs text-gray-500">
                               Joined{" "}
-                              {new Date(user.createdAt).toLocaleDateString()}
+                              {user.createdAt
+                                ? new Date(user.createdAt).toLocaleDateString()
+                                : "Unknown"}
                             </div>
                           </div>
                         </div>
