@@ -921,17 +921,23 @@ export default function Admin() {
                             </Badge>
                           </div>
                           <span className="text-gray-400 text-sm">
-                            {new Date(swap.createdAt).toLocaleDateString()}
+                            {swap.createdAt
+                              ? new Date(swap.createdAt).toLocaleDateString()
+                              : "Unknown date"}
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="text-gray-400">Offering:</p>
-                            <p className="text-white">{swap.offeredSkill}</p>
+                            <p className="text-white">
+                              {swap.offeredSkill || "Unknown skill"}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-400">Requesting:</p>
-                            <p className="text-white">{swap.requestedSkill}</p>
+                            <p className="text-white">
+                              {swap.requestedSkill || "Unknown skill"}
+                            </p>
                           </div>
                         </div>
                       </div>
