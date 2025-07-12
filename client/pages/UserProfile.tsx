@@ -558,6 +558,15 @@ export default function UserProfile() {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {requestError && (
+                <div className="bg-red-900/50 border border-red-600 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                    <p className="text-red-300 text-sm">{requestError}</p>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="skill-offered" className="text-gray-200">
                   Skill You'll Teach *
