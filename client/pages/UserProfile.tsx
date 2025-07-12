@@ -246,15 +246,31 @@ export default function UserProfile() {
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
             <h3 className="text-xl font-medium text-white mb-2">
-              Profile Not Found
+              {error?.includes("connect") ||
+              error?.includes("fetch") ||
+              error?.includes("timed out")
+                ? "Connection Error"
+                : "Profile Not Found"}
             </h3>
             <p className="text-gray-400 mb-6">
               {error || "This user profile could not be found."}
             </p>
-            <Button onClick={() => navigate("/browse")} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Browse
-            </Button>
+            <div className="flex gap-3 justify-center">
+              {(error?.includes("connect") ||
+                error?.includes("fetch") ||
+                error?.includes("timed out")) && (
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="bg-primary hover:bg-primary/80"
+                >
+                  Try Again
+                </Button>
+              )}
+              <Button onClick={() => navigate("/browse")} variant="outline">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Browse
+              </Button>
+            </div>
           </div>
         </div>
       </Layout>
