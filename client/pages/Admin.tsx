@@ -34,7 +34,173 @@ import {
   Activity,
 } from "lucide-react";
 
+interface AdminStats {
+  users: {
+    total: number;
+    active: number;
+    newThisMonth: number;
+  };
+  requests: {
+    total: number;
+    pending: number;
+    accepted: number;
+    successRate: number;
+  };
+  conversations: {
+    total: number;
+  };
+}
+
+interface AdminUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  profileCompleted: boolean;
+  createdAt: string;
+  status?: string;
+}
+
+interface ActivityItem {
+  type: string;
+  description: string;
+  timestamp: string;
+  user?: string;
+  status?: string;
+}
+
 export default function Admin() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Check if user is admin
+  useEffect(() => {
+    if (user && user.role !== "admin") {
+      navigate("/");
+      return;
+    }
+  }, [user, navigate]);
+
+  // Fetch admin data
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      if (!user || user.role !== "admin") return;
+
+      try {
+        setIsLoading(true);
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        // Fetch stats, users, and activity in parallel
+        const [statsRes, usersRes, activityRes] = await Promise.all([
+          fetch("/api/admin/stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`/api/admin/users?page=${currentPage}&search=${searchTerm}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("/api/admin/activity", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (!statsRes.ok || !usersRes.ok || !activityRes.ok) {
+          throw new Error("Failed to fetch admin data");
+        }
+
+        const [statsData, usersData, activityData] = await Promise.all([
+          statsRes.json(),
+          usersRes.json(),
+          activityRes.json(),
+        ]);
+
+        setStats(statsData);
+        setUsers(usersData.users);
+        setTotalPages(usersData.pagination.pages);
+        setActivity(activityData.activity);
+      } catch (err: any) {
+        setError(err.message || "Failed to load admin data");
+        console.error("Failed to fetch admin data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAdminData();
+  }, [user, currentPage, searchTerm]);
+
+  const handleUserStatusChange = async (userId: string, newStatus: string) => {
+    try {
+      setActionLoading(userId);
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/admin/users/${userId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user status");
+      }
+
+      // Update local state
+      setUsers(
+        users.map((user) =>
+          user._id === userId ? { ...user, status: newStatus } : user,
+        ),
+      );
+    } catch (err: any) {
+      setError(err.message || "Failed to update user status");
+      console.error("Failed to update user status:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (!user || user.role !== "admin") {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <Shield className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-white mb-2">
+              Access Denied
+            </h3>
+            <p className="text-gray-400 mb-6">
+              Admin privileges required to access this page.
+            </p>
+            <Button onClick={() => navigate("/")} variant="outline">
+              Go Home
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -47,6 +213,12 @@ export default function Admin() {
             <p className="text-gray-300">
               Manage users, monitor content, and oversee platform operations
             </p>
+            {error && (
+              <div className="mt-4 bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <span className="text-red-300 text-sm">{error}</span>
+              </div>
+            )}
           </div>
 
           {/* Stats Overview */}
