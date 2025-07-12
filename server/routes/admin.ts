@@ -276,8 +276,11 @@ router.get(
       const { limit = 10 } = req.query;
       const limitNum = parseInt(limit as string);
 
+      // Check database availability
+      const dbAvailable = await isDatabaseAvailable();
+
       // Development mode without database - return mock activity
-      if (req.noDatabaseConnection) {
+      if (!dbAvailable || req.noDatabaseConnection) {
         const mockActivity = [
           {
             type: "user_joined",
