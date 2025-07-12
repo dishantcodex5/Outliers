@@ -26,6 +26,7 @@ interface User {
   isPublic: boolean;
   role: "user" | "admin";
   avatar: string; // Generated from name initials
+  profileCompleted: boolean; // Flag for first-time setup
   createdAt?: string;
   updatedAt?: string;
 }
