@@ -258,21 +258,47 @@ export default function Browse() {
               )}
             </div>
 
+            {/* Error Display */}
+            {error && (
+              <div className="mb-8 bg-red-900/50 border border-red-700 rounded-lg p-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                <span className="text-red-300">{error}</span>
+              </div>
+            )}
+
             {/* Results Count */}
             <div className="mb-8 text-center">
-              <p className="text-gray-400 text-lg">
-                <span className="text-primary font-semibold">
-                  {filteredUsers.length}
-                </span>{" "}
-                talented individuals ready to connect
-              </p>
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <span className="text-gray-400 text-lg">
+                    Searching for talented individuals...
+                  </span>
+                </div>
+              ) : (
+                <p className="text-gray-400 text-lg">
+                  <span className="text-primary font-semibold">
+                    {chromaItems.length}
+                  </span>{" "}
+                  talented individuals ready to connect
+                </p>
+              )}
             </div>
 
             {/* ChromaGrid */}
-            {filteredUsers.length > 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+                  <p className="text-gray-400 text-lg">
+                    Loading talented individuals...
+                  </p>
+                </div>
+              </div>
+            ) : chromaItems.length > 0 ? (
               <div style={{ minHeight: "800px", position: "relative" }}>
                 <ChromaGrid
-                  items={filteredUsers}
+                  items={chromaItems}
                   radius={350}
                   damping={0.45}
                   fadeOut={0.6}
