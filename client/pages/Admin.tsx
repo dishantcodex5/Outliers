@@ -517,48 +517,48 @@ export default function Admin() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 border border-gray-600">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-gray-800/50 border border-gray-600">
               <TabsTrigger
                 value="users"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <Users className="w-4 h-4 mr-1" />
-                Users
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Users</span>
               </TabsTrigger>
               <TabsTrigger
                 value="skills"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <BookOpen className="w-4 h-4 mr-1" />
-                Skills
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Skills</span>
               </TabsTrigger>
               <TabsTrigger
                 value="swaps"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <MessageSquare className="w-4 h-4 mr-1" />
-                Swaps
+                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Swaps</span>
               </TabsTrigger>
               <TabsTrigger
                 value="messages"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-3 md:col-span-1"
               >
-                <Send className="w-4 h-4 mr-1" />
-                Messages
+                <Send className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
               <TabsTrigger
                 value="activity"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1.5 md:col-span-1"
               >
-                <Activity className="w-4 h-4 mr-1" />
-                Activity
+                <Activity className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Activity</span>
               </TabsTrigger>
               <TabsTrigger
                 value="reports"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1.5 md:col-span-1"
               >
-                <Download className="w-4 h-4 mr-1" />
-                Reports
+                <Download className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Reports</span>
               </TabsTrigger>
             </TabsList>
 
