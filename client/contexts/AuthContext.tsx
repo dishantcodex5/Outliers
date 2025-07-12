@@ -143,38 +143,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string;
     password: string;
   }) => {
-    // Mock signup - in real app this would call an API
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userData.name,
-      email: userData.email,
-      location: "",
-      profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}`,
-      skillsOffered: [],
-      skillsWanted: [],
-      availability: {
-        weekdays: false,
-        weekends: false,
-        mornings: false,
-        afternoons: false,
-        evenings: false,
-      },
-      isPublic: true,
-      role: "user",
-      avatar: userData.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase(),
-      profileCompleted: false, // New users need to complete profile
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      const data = await response.json();
 
-    setUser(newUser);
-    localStorage.setItem("skillswap_auth", JSON.stringify({ user: newUser }));
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+
+      // Add avatar initials for display
+      const userWithAvatar = {
+        ...data.user,
+        avatar: userData.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase(),
+      };
+
+      setUser(userWithAvatar);
+      localStorage.setItem(
+        "skillswap_auth",
+        JSON.stringify({ user: userWithAvatar, token: data.token }),
+      );
+    } catch (error: any) {
+      throw new Error(error.message || "Signup failed");
+    }
   };
 
   const logout = () => {
