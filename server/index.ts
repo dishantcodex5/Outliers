@@ -5,6 +5,7 @@ import { authRoutes } from "./routes/auth";
 import { userRoutes } from "./routes/users";
 import { requestRoutes } from "./routes/requests";
 import { conversationRoutes } from "./routes/conversations";
+import { skillRoutes } from "./routes/skills";
 import { handleDemo } from "./routes/demo";
 
 export function createServer() {
