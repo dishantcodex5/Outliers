@@ -205,7 +205,7 @@ router.get(
           timestamp: user.createdAt,
           user: user.name,
         })),
-        ...recentRequests.map((request) => ({
+        ...recentRequests.map((request: any) => ({
           type: "request_created",
           description: `${request.from.name} sent a skill exchange request to ${request.to.name}`,
           timestamp: request.createdAt,
