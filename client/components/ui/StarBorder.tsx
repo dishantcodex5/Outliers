@@ -18,6 +18,7 @@ const StarBorder = <T extends React.ElementType = "button">({
   color = "#a855f7",
   speed = "6s",
   thickness = 1,
+  disabled = false,
   children,
   ...rest
 }: StarBorderProps<T>) => {
@@ -26,6 +27,7 @@ const StarBorder = <T extends React.ElementType = "button">({
   return (
     <Component
       className={`star-border-container ${className}`}
+      data-disabled={disabled}
       {...(rest as any)}
       style={{
         padding: `${thickness}px 0`,
