@@ -527,77 +527,17 @@ export default function Requests() {
 
             {/* Active Sessions */}
             <TabsContent value="active" className="space-y-4">
-              {requests.scheduled.map((session) => (
-                <Card
-                  key={session.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={session.partner.profilePicture}
-                            alt={session.partner.name}
-                          />
-                          <AvatarFallback className="bg-primary text-white">
-                            {session.partner.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-white">
-                              {session.partner.name}
-                            </h3>
-                            <Badge className={getStatusColor(session.status)}>
-                              Active Exchange
-                            </Badge>
-                          </div>
-
-                          <div className="mb-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                              <span className="text-green-400">Teaching:</span>
-                              <span>{session.skill.teaching}</span>
-                              <ArrowRight className="w-4 h-4" />
-                              <span className="text-blue-400">Learning:</span>
-                              <span>{session.skill.learning}</span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                              Progress: {session.sessionsCompleted}/
-                              {session.totalSessions} sessions completed
-                            </div>
-                          </div>
-
-                          <div className="text-sm text-gray-300 mb-4">
-                            <Calendar className="w-4 h-4 inline mr-1" />
-                            Next session:{" "}
-                            {new Date(session.nextSession).toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-gray-600 text-gray-300"
-                        >
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          Message
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-primary hover:bg-primary/80"
-                        >
-                          <Calendar className="w-4 h-4 mr-1" />
-                          Schedule
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-gray-500" />
+                </div>
+                <h3 className="text-xl font-medium text-white mb-2">
+                  Active Sessions Coming Soon
+                </h3>
+                <p className="text-gray-400">
+                  Session scheduling will be available in a future update
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
