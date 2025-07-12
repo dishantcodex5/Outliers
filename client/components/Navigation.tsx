@@ -169,7 +169,7 @@ export default function Navigation() {
                     <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg mb-4">
                       <Avatar className="w-10 h-10">
                         <AvatarImage
-                          src={user?.profilePicture}
+                          src={user?.profilePhoto}
                           alt={user?.name}
                         />
                         <AvatarFallback className="bg-primary text-white">
