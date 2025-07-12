@@ -225,13 +225,13 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
           key={i}
           className="chroma-card"
           onMouseMove={handleCardMove}
-          onClick={() => handleCardClick(c.url)}
+          onClick={() => handleCardClick(c)}
           style={
             {
               "--card-border": c.borderColor || "#a855f7",
               "--card-gradient":
                 c.gradient || "linear-gradient(145deg, #a855f7, #1e293b)",
-              cursor: c.url ? "pointer" : "default",
+              cursor: c.url || c.onClick ? "pointer" : "default",
             } as React.CSSProperties
           }
         >
