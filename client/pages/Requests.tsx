@@ -51,7 +51,7 @@ interface SwapRequest {
   skillWanted: string;
   message: string;
   duration: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: "pending" | "accepted" | "rejected";
   createdAt: string;
 }
 
@@ -66,11 +66,11 @@ export default function Requests() {
   const [requests, setRequests] = useState<RequestsData>({
     incoming: [],
     outgoing: [],
-    all: []
+    all: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-    const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
   const [acceptMessage, setAcceptMessage] = useState("");
@@ -84,7 +84,9 @@ export default function Requests() {
 
       try {
         setIsLoading(true);
-        const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
         const token = authData.token;
 
         if (!token) {
@@ -115,10 +117,12 @@ export default function Requests() {
     fetchRequests();
   }, [user]);
 
-    const handleAcceptRequest = async (requestId: string) => {
+  const handleAcceptRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
       const token = authData.token;
 
       const response = await fetch(`/api/requests/${requestId}/accept`, {
@@ -155,10 +159,12 @@ export default function Requests() {
     }
   };
 
-    const handleRejectRequest = async (requestId: string) => {
+  const handleRejectRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
       const token = authData.token;
 
       const response = await fetch(`/api/requests/${requestId}/reject`, {
@@ -222,7 +228,7 @@ export default function Requests() {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    {/* Header */}
+          {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
               Swap Requests
@@ -303,123 +309,136 @@ export default function Requests() {
               </TabsTrigger>
             </TabsList>
 
-                        {/* Incoming Requests */}
+            {/* Incoming Requests */}
             <TabsContent value="incoming" className="space-y-4">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  <span className="ml-2 text-gray-300">Loading requests...</span>
+                  <span className="ml-2 text-gray-300">
+                    Loading requests...
+                  </span>
                 </div>
               ) : requests.incoming.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="w-8 h-8 text-gray-500" />
                   </div>
-                  <h3 className="text-xl font-medium text-white mb-2">No incoming requests</h3>
-                  <p className="text-gray-400">You don't have any pending incoming requests</p>
+                  <h3 className="text-xl font-medium text-white mb-2">
+                    No incoming requests
+                  </h3>
+                  <p className="text-gray-400">
+                    You don't have any pending incoming requests
+                  </p>
                 </div>
               ) : (
                 requests.incoming.map((request) => (
-                <Card
-                  key={request.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={request.from.profilePicture}
-                            alt={request.from.name}
-                          />
-                          <AvatarFallback className="bg-primary text-white">
-                            {request.from.avatar}
-                          </AvatarFallback>
-                        </Avatar>
+                  <Card
+                    key={request._id}
+                    className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4 flex-1">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={request.from.profilePhoto}
+                              alt={request.from.name}
+                            />
+                            <AvatarFallback className="bg-primary text-white">
+                              {request.from.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
 
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-white">
-                              {request.from.name}
-                            </h3>
-                            <Badge className={getStatusColor(request.status)}>
-                              {request.status}
-                            </Badge>
-                          </div>
-
-                          <div className="mb-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                              <span className="text-green-400">Offering:</span>
-                              <span>{request.skill.offering}</span>
-                              <ArrowRight className="w-4 h-4" />
-                              <span className="text-blue-400">Wants:</span>
-                              <span>{request.skill.wanting}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-white">
+                                {request.from.name}
+                              </h3>
+                              <Badge className={getStatusColor(request.status)}>
+                                {request.status}
+                              </Badge>
                             </div>
+
+                            <div className="mb-3">
+                              <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
+                                <span className="text-green-400">
+                                  Offering:
+                                </span>
+                                <span>{request.skillOffered}</span>
+                                <ArrowRight className="w-4 h-4" />
+                                <span className="text-blue-400">Wants:</span>
+                                <span>{request.skillWanted}</span>
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                Duration: {request.duration}
+                              </div>
+                            </div>
+
+                            <p className="text-gray-300 mb-4">
+                              {request.message}
+                            </p>
+
                             <div className="text-sm text-gray-400">
-                              Duration: {request.duration}
+                              Requested on{" "}
+                              {new Date(request.createdAt).toLocaleDateString()}
                             </div>
                           </div>
+                        </div>
 
-                          <p className="text-gray-300 mb-4">
-                            {request.message}
-                          </p>
-
-                          <div className="text-sm text-gray-400">
-                            Requested on{" "}
-                            {new Date(request.date).toLocaleDateString()}
+                        {request.status === "pending" && (
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setShowRejectDialog(request._id)}
+                              className="border-red-600 text-red-400 hover:bg-red-900/50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Decline
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => setShowAcceptDialog(request._id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Accept
+                            </Button>
                           </div>
-                        </div>
-                      </div>
+                        )}
 
-                      {request.status === "pending" && (
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setShowRejectDialog(request.id)}
-                            className="border-red-600 text-red-400 hover:bg-red-900/50"
-                          >
-                            <X className="w-4 h-4 mr-1" />
-                            Decline
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => setShowAcceptDialog(request.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <Check className="w-4 h-4 mr-1" />
-                            Accept
-                          </Button>
-                        </div>
-                      )}
+                        {request.status === "accepted" && (
+                          <div className="flex space-x-2">
+                            <Badge className="bg-green-900/50 text-green-300 border-green-600">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Accepted
+                            </Badge>
+                            <Button
+                              size="sm"
+                              onClick={() => setSelectedChat(request._id)}
+                              className="bg-primary hover:bg-primary/80"
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              Chat
+                            </Button>
+                          </div>
+                        )}
 
-                      {request.status === "accepted" && (
-                        <div className="flex space-x-2">
-                          <Badge className="bg-green-900/50 text-green-300 border-green-600">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Accepted
+                        {request.status === "rejected" && (
+                          <Badge className="bg-red-900/50 text-red-300 border-red-600">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Declined
                           </Badge>
-                          <Button
-                            size="sm"
-                            onClick={() => setSelectedChat(request.id)}
-                            className="bg-primary hover:bg-primary/80"
-                          >
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            Chat
-                          </Button>
-                        </div>
-                      )}
-
-                      {request.status === "rejected" && (
-                        <Badge className="bg-red-900/50 text-red-300 border-red-600">
-                          <XCircle className="w-3 h-3 mr-1" />
-                          Declined
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </TabsContent>
 
             {/* Outgoing Requests */}
