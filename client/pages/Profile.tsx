@@ -520,7 +520,7 @@ export default function Profile() {
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardContent className="p-6 text-center">
                     <div className="text-3xl font-bold text-yellow-400 mb-2">
-                      {userData.rating}
+                      {mockStats.rating}
                     </div>
                     <p className="text-gray-400">Average Rating</p>
                   </CardContent>
