@@ -80,20 +80,80 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth/User Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-300 hover:text-white hover:bg-gray-800"
-              >
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <StarBorder className="text-sm">Get Started</StarBorder>
-            </Link>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-gray-800"
+                  >
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage
+                        src={user?.profilePicture}
+                        alt={user?.name}
+                      />
+                      <AvatarFallback className="bg-primary text-white text-sm">
+                        {user?.avatar}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{user?.name}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-56 bg-gray-800 border-gray-700"
+                  align="end"
+                >
+                  <DropdownMenuLabel className="text-gray-300">
+                    My Account
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuItem
+                    asChild
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >
+                    <Link to="/profile" className="flex items-center">
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >
+                    <Link to="/requests" className="flex items-center">
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Swap Requests
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="text-red-400 hover:bg-gray-700 hover:text-red-300 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-300 hover:text-white hover:bg-gray-800"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <StarBorder className="text-sm">Get Started</StarBorder>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
