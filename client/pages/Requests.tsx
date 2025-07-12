@@ -352,7 +352,7 @@ export default function Requests() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleRejectRequest(request.id)}
+                            onClick={() => setShowRejectDialog(request.id)}
                             className="border-red-600 text-red-400 hover:bg-red-900/50"
                           >
                             <X className="w-4 h-4 mr-1" />
@@ -360,13 +360,37 @@ export default function Requests() {
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => handleAcceptRequest(request.id)}
+                            onClick={() => setShowAcceptDialog(request.id)}
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             <Check className="w-4 h-4 mr-1" />
                             Accept
                           </Button>
                         </div>
+                      )}
+
+                      {request.status === "accepted" && (
+                        <div className="flex space-x-2">
+                          <Badge className="bg-green-900/50 text-green-300 border-green-600">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Accepted
+                          </Badge>
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedChat(request.id)}
+                            className="bg-primary hover:bg-primary/80"
+                          >
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            Chat
+                          </Button>
+                        </div>
+                      )}
+
+                      {request.status === "rejected" && (
+                        <Badge className="bg-red-900/50 text-red-300 border-red-600">
+                          <XCircle className="w-3 h-3 mr-1" />
+                          Declined
+                        </Badge>
                       )}
                     </div>
                   </CardContent>
