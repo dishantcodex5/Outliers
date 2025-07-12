@@ -79,6 +79,7 @@ const convertUserToChromaItem = (
 };
 
 export default function Browse() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("");
