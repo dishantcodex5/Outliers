@@ -5,7 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import StarBorder from "@/components/ui/StarBorder";
+import ChatInterface from "@/components/ChatInterface";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageSquare,
   Clock,
@@ -17,6 +27,9 @@ import {
   ArrowRight,
   Plus,
   Filter,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
 // Mock data for swap requests
