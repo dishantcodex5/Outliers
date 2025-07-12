@@ -327,6 +327,127 @@ export default function Profile() {
               </TabsTrigger>
             </TabsList>
 
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-primary mb-2">
+                      {mockStats.completedExchanges}
+                    </div>
+                    <p className="text-gray-400">Total Exchanges</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-green-400 mb-2">
+                      {localUser.skillsOffered.length}
+                    </div>
+                    <p className="text-gray-400">Skills Teaching</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-blue-400 mb-2">
+                      {localUser.skillsWanted.length}
+                    </div>
+                    <p className="text-gray-400">Skills Learning</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-yellow-400 mb-2">
+                      {mockStats.rating}
+                    </div>
+                    <p className="text-gray-400">Average Rating</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Quick Actions */}
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="text-white">Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <StarBorder as="div" color="#10b981" speed="5s">
+                      <Button
+                        onClick={() => setActiveTab("skills")}
+                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add New Skill
+                      </Button>
+                    </StarBorder>
+                    <StarBorder as="div" color="#3b82f6" speed="5s">
+                      <Button
+                        onClick={() => setActiveTab("messages")}
+                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        View Messages
+                      </Button>
+                    </StarBorder>
+                    <StarBorder as="div" color="#8b5cf6" speed="5s">
+                      <Button
+                        onClick={() => setActiveTab("settings")}
+                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </StarBorder>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Activity Preview */}
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-blue-400" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {recentActivity.slice(0, 3).map((activity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 p-3 bg-gray-700/50 rounded-lg"
+                    >
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          activity.type === "completed"
+                            ? "bg-green-400"
+                            : "bg-blue-400"
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <p className="text-white font-medium">
+                          {activity.title}
+                        </p>
+                        <p className="text-sm text-gray-400">{activity.date}</p>
+                      </div>
+                      {activity.type === "completed" && (
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveTab("activity")}
+                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    View All Activity
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Skills Tab */}
             <TabsContent value="skills" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
