@@ -12,6 +12,7 @@ import Browse from "./pages/Browse";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import ProfileSetup from "./pages/ProfileSetup";
 import Requests from "./pages/Requests";
 import Feedback from "./pages/Feedback";
 import Admin from "./pages/Admin";
