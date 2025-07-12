@@ -108,14 +108,14 @@ export default function Home() {
 
         {/* Hero Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white mb-6">
             Exchange Skills,
             <span className="bg-gradient-to-r from-primary to-skill-400 bg-clip-text text-transparent">
               {" "}
               Grow Together
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed px-4">
             Connect with like-minded individuals and trade your expertise. Learn
             something new while sharing your knowledge with others in our
             thriving community.
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto px-4">
             <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
               <div className="text-4xl font-bold text-primary mb-2">1,200+</div>
               <div className="text-gray-200 text-lg">Active Users</div>
@@ -172,7 +172,7 @@ export default function Home() {
       <section className="py-20 bg-gray-800 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
               Popular Skills on SkillSwap
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -180,7 +180,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {featuredSkills.map((skill) => (
               <Card
                 key={skill.name}
@@ -206,7 +206,7 @@ export default function Home() {
       <section className="py-20 bg-gray-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
               How SkillSwap Works
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -241,7 +241,7 @@ export default function Home() {
       <section className="py-20 bg-gray-800 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
               Success Stories
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -293,7 +293,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary via-skill-600 to-primary relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Start Your Skill Journey?
           </h2>
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">

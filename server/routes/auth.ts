@@ -102,6 +102,50 @@ router.post(
     try {
       const { email, password } = req.body;
 
+      // Check for admin credentials first
+      const adminEmail = "admin@skillswap.com";
+      const adminPassword = "admin123";
+
+      if (
+        email.toLowerCase().trim() === adminEmail.toLowerCase() &&
+        password.trim() === adminPassword
+      ) {
+        const adminUser = {
+          _id: "admin-user-fixed",
+          name: "Admin User",
+          email: adminEmail,
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=admin`,
+          profileCompleted: true,
+          role: "admin",
+          location: "",
+          skillsOffered: [],
+          skillsWanted: [],
+          availability: {
+            weekdays: false,
+            weekends: false,
+            mornings: false,
+            afternoons: false,
+            evenings: false,
+          },
+          isPublic: true,
+          rating: 5,
+          totalExchanges: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const token = generateToken({
+          userId: adminUser._id,
+          email: adminUser.email,
+        });
+
+        return res.json({
+          message: "Admin login successful",
+          token,
+          user: adminUser,
+        });
+      }
+
       // Development mode without database - return mock success for any credentials
       if ((req as any).noDatabaseConnection) {
         const mockUser = {
@@ -110,6 +154,22 @@ router.post(
           email: email.toLowerCase(),
           profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
           profileCompleted: false,
+          role: "user",
+          location: "",
+          skillsOffered: [],
+          skillsWanted: [],
+          availability: {
+            weekdays: false,
+            weekends: false,
+            mornings: false,
+            afternoons: false,
+            evenings: false,
+          },
+          isPublic: true,
+          rating: 0,
+          totalExchanges: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           isDevelopmentUser: true,
         };
 

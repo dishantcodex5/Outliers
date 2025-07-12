@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StarBorder from "@/components/ui/StarBorder";
 import SkillsManager from "@/components/SkillsManager";
 import ProfileSettings from "@/components/ProfileSettings";
@@ -39,6 +41,8 @@ import {
   Trophy,
   Loader2,
   AlertCircle,
+  ArrowRight,
+  Search,
 } from "lucide-react";
 
 interface ProfileStats {
@@ -62,10 +66,44 @@ interface Achievement {
   earned: boolean;
 }
 
+interface ConversationData {
+  id: string;
+  otherUser: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+  };
+  lastMessage?: {
+    content: string;
+    sender: string;
+    timestamp: string;
+  };
+  messageCount: number;
+  unreadCount: number;
+  updatedAt: string;
+  swapRequest?: any;
+}
+
+interface Message {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: string;
+  type: "text" | "file" | "system";
+  status: "sent" | "delivered" | "read";
+  fileUrl?: string;
+  fileName?: string;
+}
+
 export default function Profile() {
   const { user } = useAuth();
   const [localUser, setLocalUser] = useState(user);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationData[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [stats, setStats] = useState<ProfileStats>({
     rating: 0,
@@ -176,6 +214,16 @@ export default function Profile() {
           },
         ];
         setAchievements(userAchievements);
+
+        // Fetch conversations
+        const conversationsResponse = await fetch("/api/conversations", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (conversationsResponse.ok) {
+          const conversationsData = await conversationsResponse.json();
+          setConversations(conversationsData.conversations || []);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to load profile data");
         console.error("Failed to fetch profile data:", err);
@@ -191,8 +239,92 @@ export default function Profile() {
     return null; // This should not happen due to protected route
   }
 
-  const handleSendMessage = (content: string) => {
-    console.log("Sending message:", content);
+  // Fetch messages for selected conversation
+  const fetchMessages = async (conversationId: string) => {
+    try {
+      setMessagesLoading(true);
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/conversations/${conversationId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch messages");
+      }
+
+      const data = await response.json();
+      setMessages(data.conversation.messages || []);
+    } catch (err: any) {
+      setError(err.message || "Failed to load messages");
+      console.error("Failed to fetch messages:", err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  };
+
+  // Send message
+  const handleSendMessage = async (content: string) => {
+    if (!selectedChat || !user) return;
+
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(
+        `/api/conversations/${selectedChat}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            content,
+            type: "text",
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      const data = await response.json();
+
+      // Add the new message to the local state
+      setMessages((prev) => [...prev, data.messageData]);
+
+      // Update the conversation's last message in the list
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === selectedChat
+            ? {
+                ...conv,
+                lastMessage: {
+                  content,
+                  sender: user.id,
+                  timestamp: new Date().toISOString(),
+                },
+              }
+            : conv,
+        ),
+      );
+    } catch (err: any) {
+      setError(err.message || "Failed to send message");
+      console.error("Failed to send message:", err);
+    }
+  };
+
+  // Open conversation
+  const openConversation = (conversationId: string) => {
+    setSelectedChat(conversationId);
+    fetchMessages(conversationId);
   };
 
   const handleAddTeachingSkill = async (skill: {
@@ -304,7 +436,7 @@ export default function Profile() {
 
           {/* Profile Header Card */}
           <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl mb-8">
-            <CardContent className="p-8">
+            <CardContent className="p-4 md:p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg border-2 border-primary/20">
                   {localUser.profilePhoto ? (
@@ -330,7 +462,7 @@ export default function Profile() {
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {stats.rating.toFixed(1)}
+                        {stats.rating.toFixed(2)}
                       </span>
                       <span className="text-gray-400">
                         ({stats.completedExchanges} exchanges)
@@ -439,48 +571,41 @@ export default function Profile() {
             onValueChange={setActiveTab}
             className="space-y-6"
           >
-            <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 border border-gray-600">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-gray-800/50 border border-gray-600">
               <TabsTrigger
                 value="overview"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <BarChart3 className="w-4 h-4 mr-1" />
-                Overview
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger
                 value="skills"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <BookOpen className="w-4 h-4 mr-1" />
-                Skills
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Skills</span>
               </TabsTrigger>
               <TabsTrigger
                 value="activity"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-2 md:col-span-1"
               >
-                <Clock className="w-4 h-4 mr-1" />
-                Activity
-              </TabsTrigger>
-              <TabsTrigger
-                value="achievements"
-                className="data-[state=active]:bg-primary"
-              >
-                <Trophy className="w-4 h-4 mr-1" />
-                Achievements
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Activity</span>
               </TabsTrigger>
               <TabsTrigger
                 value="messages"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1"
               >
-                <MessageCircle className="w-4 h-4 mr-1" />
-                Messages
+                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1"
               >
-                <Settings className="w-4 h-4 mr-1" />
-                Settings
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Settings</span>
               </TabsTrigger>
             </TabsList>
 
@@ -526,7 +651,7 @@ export default function Profile() {
                     <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                       <CardContent className="p-6 text-center">
                         <div className="text-3xl font-bold text-yellow-400 mb-2">
-                          {stats.rating.toFixed(1)}
+                          {stats.rating.toFixed(2)}
                         </div>
                         <p className="text-gray-400">Average Rating</p>
                       </CardContent>
@@ -622,7 +747,7 @@ export default function Profile() {
 
             {/* Skills Tab */}
             <TabsContent value="skills" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
@@ -762,60 +887,6 @@ export default function Profile() {
               </Card>
             </TabsContent>
 
-            {/* Achievements Tab */}
-            <TabsContent value="achievements">
-              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Award className="w-5 h-5 text-yellow-400" />
-                    Achievements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {achievements.map((achievement, index) => (
-                      <div
-                        key={index}
-                        className={`p-4 rounded-lg border-2 ${
-                          achievement.earned
-                            ? "bg-yellow-900/20 border-yellow-600"
-                            : "bg-gray-700/50 border-gray-600"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <Award
-                            className={`w-6 h-6 ${
-                              achievement.earned
-                                ? "text-yellow-400"
-                                : "text-gray-500"
-                            }`}
-                          />
-                          <h3
-                            className={`font-semibold ${
-                              achievement.earned
-                                ? "text-yellow-300"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {achievement.title}
-                          </h3>
-                        </div>
-                        <p
-                          className={`text-sm ${
-                            achievement.earned
-                              ? "text-yellow-200"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          {achievement.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
             {/* Statistics Tab */}
             <TabsContent value="stats">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -861,85 +932,140 @@ export default function Profile() {
             <TabsContent value="messages">
               <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5 text-blue-400" />
-                    Recent Conversations
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <MessageCircle className="w-5 h-5 text-blue-400" />
+                      Conversations
+                    </CardTitle>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Search conversations..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 bg-gray-700 border-gray-600 text-white"
+                      />
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Mock conversations */}
-                  {[
-                    {
-                      id: "1",
-                      name: "Sarah Chen",
-                      avatar: "SC",
-                      lastMessage:
-                        "Thanks for the React session! When can we do the design lesson?",
-                      timestamp: "2 hours ago",
-                      unread: 2,
-                    },
-                    {
-                      id: "2",
-                      name: "Mike Johnson",
-                      avatar: "MJ",
-                      lastMessage:
-                        "Great explanation of Node.js concepts. Really helped!",
-                      timestamp: "1 day ago",
-                      unread: 0,
-                    },
-                    {
-                      id: "3",
-                      name: "Emma Rodriguez",
-                      avatar: "ER",
-                      lastMessage:
-                        "Looking forward to our photography session this weekend",
-                      timestamp: "2 days ago",
-                      unread: 1,
-                    },
-                  ].map((conversation) => (
-                    <div
-                      key={conversation.id}
-                      className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
-                      onClick={() => setSelectedChat(conversation.id)}
-                    >
-                      <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-primary to-skill-600 rounded-full flex items-center justify-center">
-                          <span className="text-white font-semibold">
-                            {conversation.avatar}
-                          </span>
-                        </div>
-                        {conversation.unread > 0 && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">
-                              {conversation.unread}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium">
-                          {conversation.name}
-                        </h4>
-                        <p className="text-gray-300 text-sm truncate">
-                          {conversation.lastMessage}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-400 text-xs">
-                          {conversation.timestamp}
-                        </p>
-                      </div>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <span className="ml-2 text-gray-300">
+                        Loading conversations...
+                      </span>
                     </div>
-                  ))}
+                  ) : conversations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MessageCircle className="w-12 h-12 text-gray-500 mx-auto mb-3 opacity-50" />
+                      <p className="text-gray-400">No conversations yet</p>
+                      <p className="text-sm text-gray-500">
+                        Start exchanging skills to begin conversations with
+                        other users.
+                      </p>
+                    </div>
+                  ) : (
+                    conversations
+                      .filter(
+                        (conv) =>
+                          conv.otherUser.name
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase()) ||
+                          conv.lastMessage?.content
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase()),
+                      )
+                      .map((conversation) => {
+                        const isLastMessageFromOther =
+                          conversation.lastMessage?.sender !== user.id;
 
-                  <div className="text-center pt-4">
-                    <Button
-                      variant="outline"
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                    >
-                      View All Conversations
-                    </Button>
-                  </div>
+                        return (
+                          <div
+                            key={conversation.id}
+                            className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+                            onClick={() => openConversation(conversation.id)}
+                          >
+                            <div className="relative">
+                              <Avatar className="w-12 h-12">
+                                <AvatarImage
+                                  src={conversation.otherUser.profilePhoto}
+                                  alt={conversation.otherUser.name}
+                                />
+                                <AvatarFallback className="bg-primary text-white">
+                                  {conversation.otherUser.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              {conversation.unreadCount > 0 && (
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-xs">
+                                    {conversation.unreadCount}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-white font-medium truncate">
+                                  {conversation.otherUser.name}
+                                </h4>
+                                {conversation.swapRequest && (
+                                  <Badge className="bg-blue-900/50 text-blue-300 border-blue-600 text-xs">
+                                    Skill Exchange
+                                  </Badge>
+                                )}
+                              </div>
+
+                              {conversation.lastMessage ? (
+                                <>
+                                  <p
+                                    className={`text-sm truncate ${
+                                      isLastMessageFromOther &&
+                                      conversation.unreadCount > 0
+                                        ? "text-white font-medium"
+                                        : "text-gray-400"
+                                    }`}
+                                  >
+                                    {conversation.lastMessage.sender === user.id
+                                      ? "You: "
+                                      : ""}
+                                    {conversation.lastMessage.content}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {new Date(
+                                      conversation.lastMessage.timestamp,
+                                    ).toLocaleString()}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-sm text-gray-400">
+                                  No messages yet
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <div className="text-right">
+                                <div className="text-xs text-gray-400">
+                                  {conversation.messageCount} messages
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {new Date(
+                                    conversation.updatedAt,
+                                  ).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <ArrowRight className="w-4 h-4 text-gray-400" />
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -959,54 +1085,58 @@ export default function Profile() {
             open={!!selectedChat}
             onOpenChange={() => setSelectedChat(null)}
           >
-            <DialogContent className="bg-transparent border-none p-0 max-w-4xl">
+            <DialogContent className="bg-transparent border-none p-0 max-w-4xl max-h-[90vh]">
               <DialogHeader className="sr-only">
-                <DialogTitle>Chat with Sarah Chen</DialogTitle>
+                <DialogTitle>Chat Interface</DialogTitle>
               </DialogHeader>
-              <ChatInterface
-                currentUser={{
-                  id: user.id,
-                  name: user.name,
-                  avatar: user.avatar,
-                  profilePhoto: user.profilePhoto,
-                  online: true,
-                }}
-                otherUser={{
-                  id: "other-user",
-                  name: "Sarah Chen",
-                  avatar: "SC",
-                  profilePhoto:
-                    "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-                  online: true,
-                  lastSeen: "5 minutes ago",
-                }}
-                messages={[
-                  {
-                    id: "1",
-                    senderId: "other-user",
-                    content:
-                      "Thanks for the React session! When can we do the design lesson?",
-                    timestamp: new Date(
-                      Date.now() - 2 * 60 * 60 * 1000,
-                    ).toISOString(),
-                    type: "text",
-                    status: "read",
-                  },
-                  {
-                    id: "2",
-                    senderId: user.id,
-                    content:
-                      "I'm glad you found it helpful! How about this Thursday at 7 PM for the design session?",
-                    timestamp: new Date(
-                      Date.now() - 1 * 60 * 60 * 1000,
-                    ).toISOString(),
-                    type: "text",
-                    status: "read",
-                  },
-                ]}
-                onSendMessage={handleSendMessage}
-                onScheduleSession={() => console.log("Scheduling session")}
-              />
+              {messagesLoading ? (
+                <div className="bg-gray-800 rounded-lg p-8 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">
+                    Loading messages...
+                  </span>
+                </div>
+              ) : (
+                (() => {
+                  const conversation = conversations.find(
+                    (c) => c.id === selectedChat,
+                  );
+                  if (!conversation) return null;
+
+                  return (
+                    <ChatInterface
+                      currentUser={{
+                        id: user.id,
+                        name: user.name,
+                        avatar:
+                          user.avatar ||
+                          user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase(),
+                        profilePhoto: user.profilePhoto,
+                        online: true,
+                      }}
+                      otherUser={{
+                        id: conversation.otherUser._id,
+                        name: conversation.otherUser.name,
+                        avatar: conversation.otherUser.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase(),
+                        profilePhoto: conversation.otherUser.profilePhoto,
+                        online: false, // We don't have real-time presence yet
+                        lastSeen: "Recently",
+                      }}
+                      messages={messages}
+                      onSendMessage={handleSendMessage}
+                      onScheduleSession={() => console.log("Schedule session")}
+                    />
+                  );
+                })()
+              )}
             </DialogContent>
           </Dialog>
         )}

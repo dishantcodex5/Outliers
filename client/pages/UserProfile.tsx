@@ -429,10 +429,10 @@ export default function UserProfile() {
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {(4.5 + Math.random() * 0.5).toFixed(1)}
+                        {(4.5 + Math.random() * 0.5).toFixed(2)}
                       </span>
                       <span className="text-gray-400">
-                        ({Math.floor(Math.random() * 50) + 5} reviews)
+                        ({(Math.random() * 50 + 5).toFixed(2)} reviews)
                       </span>
                     </div>
                     <Badge className="bg-green-900/50 text-green-300 border-green-600">

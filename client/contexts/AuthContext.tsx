@@ -110,7 +110,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const authData = JSON.parse(savedAuth);
         if (authData.user && authData.token) {
-          setUser(authData.user);
+          // Ensure consistent ID mapping and avatar
+          const userWithConsistentData = {
+            ...authData.user,
+            id: authData.user._id || authData.user.id,
+            avatar:
+              authData.user.avatar ||
+              authData.user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase(),
+          };
+          setUser(userWithConsistentData);
         } else {
           // Invalid auth data, remove it
           localStorage.removeItem("skillswap_auth");
@@ -143,10 +155,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.message || "Login failed");
       }
 
-      setUser(data.user);
+      // Add avatar initials and map ID for display
+      const userWithAvatar = {
+        ...data.user,
+        id: data.user._id || data.user.id, // Map _id to id for consistency
+        avatar: data.user.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase(),
+      };
+
+      setUser(userWithAvatar);
       localStorage.setItem(
         "skillswap_auth",
-        JSON.stringify({ user: data.user, token: data.token }),
+        JSON.stringify({ user: userWithAvatar, token: data.token }),
       );
     } catch (error: any) {
       throw new Error(error.message || "Login failed");
@@ -178,9 +201,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.message || "Signup failed");
       }
 
-      // Add avatar initials for display
+      // Add avatar initials and map ID for display
       const userWithAvatar = {
         ...data.user,
+        id: data.user._id || data.user.id, // Map _id to id for consistency
         avatar: userData.name
           .split(" ")
           .map((n) => n[0])
