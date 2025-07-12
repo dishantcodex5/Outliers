@@ -422,7 +422,7 @@ export default function Requests() {
                             </Badge>
                             <Button
                               size="sm"
-                              onClick={() => setSelectedChat(request._id)}
+                              onClick={() => navigate("/conversations")}
                               className="bg-primary hover:bg-primary/80"
                             >
                               <MessageSquare className="w-4 h-4 mr-1" />
