@@ -195,31 +195,75 @@ export default function Profile() {
     console.log("Sending message:", content);
   };
 
-  const handleAddTeachingSkill = (skill: {
+  const handleAddTeachingSkill = async (skill: {
     skill: string;
     description: string;
     isApproved?: boolean;
   }) => {
-    const updatedUser = {
-      ...localUser,
-      skillsOffered: [...localUser.skillsOffered, skill],
-    };
-    setLocalUser(updatedUser);
-    // In a real app, this would make an API call to update the user
-    console.log("Added teaching skill:", skill);
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch("/api/users/skills/offered", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(skill),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add teaching skill");
+      }
+
+      const data = await response.json();
+      const updatedUser = {
+        ...localUser,
+        skillsOffered: [...localUser.skillsOffered, data.skill],
+      };
+      setLocalUser(updatedUser);
+    } catch (error: any) {
+      setError(error.message || "Failed to add teaching skill");
+      console.error("Failed to add teaching skill:", error);
+    }
   };
 
-  const handleAddLearningSkill = (skill: {
+  const handleAddLearningSkill = async (skill: {
     skill: string;
     description: string;
   }) => {
-    const updatedUser = {
-      ...localUser,
-      skillsWanted: [...localUser.skillsWanted, skill],
-    };
-    setLocalUser(updatedUser);
-    // In a real app, this would make an API call to update the user
-    console.log("Added learning skill:", skill);
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch("/api/users/skills/wanted", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(skill),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add learning skill");
+      }
+
+      const data = await response.json();
+      const updatedUser = {
+        ...localUser,
+        skillsWanted: [...localUser.skillsWanted, data.skill],
+      };
+      setLocalUser(updatedUser);
+    } catch (error: any) {
+      setError(error.message || "Failed to add learning skill");
+      console.error("Failed to add learning skill:", error);
+    }
   };
 
   const getAvailabilityText = () => {
