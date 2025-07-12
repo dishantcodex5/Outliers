@@ -167,6 +167,27 @@ export default function Navigation() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <div className="flex flex-col space-y-4 mt-4">
+                  {/* User Profile Section for Mobile */}
+                  {isAuthenticated && (
+                    <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg mb-4">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage
+                          src={user?.profilePicture}
+                          alt={user?.name}
+                        />
+                        <AvatarFallback className="bg-primary text-white">
+                          {user?.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-white font-medium text-sm">
+                          {user?.name}
+                        </p>
+                        <p className="text-gray-400 text-xs">{user?.email}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {navItems.map((item) => (
                     <Link
                       key={item.path}
@@ -182,18 +203,49 @@ export default function Navigation() {
                       <span>{item.name}</span>
                     </Link>
                   ))}
+
+                  {/* Mobile Auth/Profile Actions */}
                   <div className="border-t pt-4 mt-4 space-y-2">
-                    <Link to="/login" onClick={() => setIsOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
-                      >
-                        Sign In
-                      </Button>
-                    </Link>
-                    <Link to="/signup" onClick={() => setIsOpen(false)}>
-                      <StarBorder className="w-full">Get Started</StarBorder>
-                    </Link>
+                    {isAuthenticated ? (
+                      <>
+                        <Link to="/profile" onClick={() => setIsOpen(false)}>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+                          >
+                            <User className="w-4 h-4 mr-2" />
+                            Profile
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            logout();
+                            setIsOpen(false);
+                          }}
+                          className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-gray-800"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link to="/login" onClick={() => setIsOpen(false)}>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+                          >
+                            Sign In
+                          </Button>
+                        </Link>
+                        <Link to="/signup" onClick={() => setIsOpen(false)}>
+                          <StarBorder className="w-full">
+                            Get Started
+                          </StarBorder>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
