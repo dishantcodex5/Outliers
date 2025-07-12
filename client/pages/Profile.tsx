@@ -64,7 +64,7 @@ const achievements = [
 ];
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   const [localUser, setLocalUser] = useState(user);
 
   if (!user || !localUser) {
