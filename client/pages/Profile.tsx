@@ -50,7 +50,7 @@ interface ProfileStats {
 }
 
 interface Activity {
-  type: 'completed' | 'upcoming' | 'request';
+  type: "completed" | "upcoming" | "request";
   title: string;
   date: string;
   id?: string;
@@ -79,14 +79,16 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-    // Fetch profile data from API
+  // Fetch profile data from API
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!user) return;
 
       try {
         setIsLoading(true);
-        const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
         const token = authData.token;
 
         if (!token) {
@@ -114,8 +116,11 @@ export default function Profile() {
           // Set stats
           setStats({
             rating: 4.5 + Math.random() * 0.5, // Mock rating for now
-            completedExchanges: requests.incoming.filter((r: any) => r.status === 'accepted').length +
-                                requests.outgoing.filter((r: any) => r.status === 'accepted').length,
+            completedExchanges:
+              requests.incoming.filter((r: any) => r.status === "accepted")
+                .length +
+              requests.outgoing.filter((r: any) => r.status === "accepted")
+                .length,
             profileCompleteness: completeness,
             requestsReceived: requests.incoming.length,
             requestsSent: requests.outgoing.length,
@@ -125,16 +130,16 @@ export default function Profile() {
           const activity: Activity[] = [];
           requests.incoming.slice(0, 2).forEach((req: any) => {
             activity.push({
-              type: req.status === 'accepted' ? 'completed' : 'request',
-              title: `${req.status === 'accepted' ? 'Completed' : 'Received'} exchange request from ${req.from.name}`,
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Received"} exchange request from ${req.from.name}`,
               date: new Date(req.createdAt).toLocaleDateString(),
               id: req._id,
             });
           });
           requests.outgoing.slice(0, 1).forEach((req: any) => {
             activity.push({
-              type: req.status === 'accepted' ? 'completed' : 'request',
-              title: `${req.status === 'accepted' ? 'Completed' : 'Sent'} exchange request to ${req.to.name}`,
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Sent"} exchange request to ${req.to.name}`,
               date: new Date(req.createdAt).toLocaleDateString(),
               id: req._id,
             });
@@ -171,7 +176,6 @@ export default function Profile() {
           },
         ];
         setAchievements(userAchievements);
-
       } catch (err: any) {
         setError(err.message || "Failed to load profile data");
         console.error("Failed to fetch profile data:", err);
@@ -191,13 +195,15 @@ export default function Profile() {
     console.log("Sending message:", content);
   };
 
-    const handleAddTeachingSkill = async (skill: {
+  const handleAddTeachingSkill = async (skill: {
     skill: string;
     description: string;
     isApproved?: boolean;
   }) => {
     try {
-      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
       const token = authData.token;
 
       const response = await fetch("/api/users/skills/offered", {
@@ -230,7 +236,9 @@ export default function Profile() {
     description: string;
   }) => {
     try {
-      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
       const token = authData.token;
 
       const response = await fetch("/api/users/skills/wanted", {
@@ -282,7 +290,7 @@ export default function Profile() {
             <h1 className="text-3xl font-bold text-white mb-2">
               Profile Dashboard
             </h1>
-                        <p className="text-gray-300">
+            <p className="text-gray-300">
               Manage your skills, track your progress, and connect with the
               community
             </p>
@@ -321,7 +329,7 @@ export default function Profile() {
                     </h2>
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                                            <span className="text-white font-semibold">
+                      <span className="text-white font-semibold">
                         {stats.rating.toFixed(1)}
                       </span>
                       <span className="text-gray-400">
@@ -408,14 +416,11 @@ export default function Profile() {
                   <span className="text-white font-medium">
                     Profile Completeness
                   </span>
-                                    <span className="text-primary font-semibold">
+                  <span className="text-primary font-semibold">
                     {stats.profileCompleteness}%
                   </span>
                 </div>
-                <Progress
-                  value={stats.profileCompleteness}
-                  className="h-2"
-                />
+                <Progress value={stats.profileCompleteness} className="h-2" />
                 <p className="text-sm text-gray-400 mt-2">
                   {user.skillsOffered.length === 0 &&
                     "Add skills you can teach. "}
@@ -479,12 +484,14 @@ export default function Profile() {
               </TabsTrigger>
             </TabsList>
 
-                        {/* Overview Tab */}
+            {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  <span className="ml-2 text-gray-300">Loading profile data...</span>
+                  <span className="ml-2 text-gray-300">
+                    Loading profile data...
+                  </span>
                 </div>
               ) : (
                 <>
@@ -498,113 +505,119 @@ export default function Profile() {
                       </CardContent>
                     </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">
-                      {localUser.skillsOffered.length}
-                    </div>
-                    <p className="text-gray-400">Skills Teaching</p>
-                  </CardContent>
-                </Card>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-green-400 mb-2">
+                          {localUser.skillsOffered.length}
+                        </div>
+                        <p className="text-gray-400">Skills Teaching</p>
+                      </CardContent>
+                    </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">
-                      {localUser.skillsWanted.length}
-                    </div>
-                    <p className="text-gray-400">Skills Learning</p>
-                  </CardContent>
-                </Card>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-blue-400 mb-2">
+                          {localUser.skillsWanted.length}
+                        </div>
+                        <p className="text-gray-400">Skills Learning</p>
+                      </CardContent>
+                    </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">
-                      {mockStats.rating}
-                    </div>
-                    <p className="text-gray-400">Average Rating</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                <CardHeader>
-                  <CardTitle className="text-white">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <StarBorder as="div" color="#10b981" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("skills")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add New Skill
-                      </Button>
-                    </StarBorder>
-                    <StarBorder as="div" color="#3b82f6" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("messages")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        View Messages
-                      </Button>
-                    </StarBorder>
-                    <StarBorder as="div" color="#8b5cf6" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("settings")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        Edit Profile
-                      </Button>
-                    </StarBorder>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-yellow-400 mb-2">
+                          {mockStats.rating}
+                        </div>
+                        <p className="text-gray-400">Average Rating</p>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardContent>
-              </Card>
 
-              {/* Recent Activity Preview */}
-              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-400" />
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentActivity.slice(0, 3).map((activity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 p-3 bg-gray-700/50 rounded-lg"
-                    >
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          activity.type === "completed"
-                            ? "bg-green-400"
-                            : "bg-blue-400"
-                        }`}
-                      />
-                      <div className="flex-1">
-                        <p className="text-white font-medium">
-                          {activity.title}
-                        </p>
-                        <p className="text-sm text-gray-400">{activity.date}</p>
+                  {/* Quick Actions */}
+                  <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                    <CardHeader>
+                      <CardTitle className="text-white">
+                        Quick Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <StarBorder as="div" color="#10b981" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("skills")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add New Skill
+                          </Button>
+                        </StarBorder>
+                        <StarBorder as="div" color="#3b82f6" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("messages")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            View Messages
+                          </Button>
+                        </StarBorder>
+                        <StarBorder as="div" color="#8b5cf6" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("settings")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Profile
+                          </Button>
+                        </StarBorder>
                       </div>
-                      {activity.type === "completed" && (
-                        <CheckCircle className="w-5 h-5 text-green-400" />
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab("activity")}
-                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
-                  >
-                    View All Activity
-                  </Button>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+
+                  {/* Recent Activity Preview */}
+                  <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-blue-400" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {recentActivity.slice(0, 3).map((activity, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-4 p-3 bg-gray-700/50 rounded-lg"
+                        >
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              activity.type === "completed"
+                                ? "bg-green-400"
+                                : "bg-blue-400"
+                            }`}
+                          />
+                          <div className="flex-1">
+                            <p className="text-white font-medium">
+                              {activity.title}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              {activity.date}
+                            </p>
+                          </div>
+                          {activity.type === "completed" && (
+                            <CheckCircle className="w-5 h-5 text-green-400" />
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        onClick={() => setActiveTab("activity")}
+                        className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                      >
+                        View All Activity
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </TabsContent>
 
             {/* Skills Tab */}
