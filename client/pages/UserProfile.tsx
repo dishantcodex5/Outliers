@@ -82,22 +82,65 @@ export default function UserProfile() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = async (retryCount = 0) => {
       if (!userId) return;
 
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/users/${userId}`);
+        setError(null); // Clear previous errors
+
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        const response = await fetch(`/api/users/${userId}`, {
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
+          if (response.status === 404) {
+            throw new Error("User not found");
+          } else if (response.status >= 500) {
+            throw new Error("Server error. Please try again later.");
+          } else {
+            throw new Error(
+              `Failed to fetch user profile (${response.status})`,
+            );
+          }
         }
 
         const data = await response.json();
         setUserData(data.user);
+        setError(null); // Clear error on success
       } catch (err: any) {
-        setError(err.message || "Failed to load user profile");
         console.error("Failed to fetch user profile:", err);
+
+        // Handle different types of errors
+        if (err.name === "AbortError") {
+          setError(
+            "Request timed out. Please check your connection and try again.",
+          );
+        } else if (err.message === "Failed to fetch") {
+          // Network error - maybe retry
+          if (retryCount < 2) {
+            console.log(`Retrying fetch (attempt ${retryCount + 1})`);
+            setTimeout(
+              () => fetchUserProfile(retryCount + 1),
+              1000 * (retryCount + 1),
+            );
+            return;
+          }
+          setError(
+            "Unable to connect to server. Please check your internet connection and try again.",
+          );
+        } else {
+          setError(err.message || "Failed to load user profile");
+        }
       } finally {
         setIsLoading(false);
       }
