@@ -32,6 +32,13 @@ import {
   TrendingUp,
   UserCheck,
   Activity,
+  BookOpen,
+  Download,
+  Send,
+  Eye,
+  X,
+  Plus,
+  FileText,
 } from "lucide-react";
 
 interface AdminStats {
@@ -69,18 +76,74 @@ interface ActivityItem {
   status?: string;
 }
 
+interface SkillSubmission {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  skill: string;
+  description: string;
+  category: string;
+  isApproved: boolean;
+  createdAt: string;
+}
+
+interface SwapRequest {
+  _id: string;
+  from: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  to: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  offeredSkill: string;
+  requestedSkill: string;
+  status: "pending" | "accepted" | "rejected" | "cancelled";
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PlatformMessage {
+  _id?: string;
+  title: string;
+  content: string;
+  type: "announcement" | "maintenance" | "feature";
+  priority: "low" | "medium" | "high";
+  targetUsers: "all" | "active" | "inactive";
+  scheduledAt?: string;
+  createdAt?: string;
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [skillSubmissions, setSkillSubmissions] = useState<SkillSubmission[]>(
+    [],
+  );
+  const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [messageForm, setMessageForm] = useState<PlatformMessage>({
+    title: "",
+    content: "",
+    type: "announcement",
+    priority: "medium",
+    targetUsers: "all",
+  });
+  const [showMessageForm, setShowMessageForm] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -107,33 +170,45 @@ export default function Admin() {
           return;
         }
 
-        // Fetch stats, users, and activity in parallel
-        const [statsRes, usersRes, activityRes] = await Promise.all([
-          fetch("/api/admin/stats", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`/api/admin/users?page=${currentPage}&search=${searchTerm}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/admin/activity", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+        // Fetch stats, users, activity, skills, and swaps in parallel
+        const [statsRes, usersRes, activityRes, skillsRes, swapsRes] =
+          await Promise.all([
+            fetch("/api/admin/stats", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`/api/admin/users?page=${currentPage}&search=${searchTerm}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/admin/activity", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/admin/skills/pending", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/admin/swaps", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+          ]);
 
         if (!statsRes.ok || !usersRes.ok || !activityRes.ok) {
           throw new Error("Failed to fetch admin data");
         }
 
-        const [statsData, usersData, activityData] = await Promise.all([
-          statsRes.json(),
-          usersRes.json(),
-          activityRes.json(),
-        ]);
+        const [statsData, usersData, activityData, skillsData, swapsData] =
+          await Promise.all([
+            statsRes.json(),
+            usersRes.json(),
+            activityRes.json(),
+            skillsRes.ok ? skillsRes.json() : { skills: [] },
+            swapsRes.ok ? swapsRes.json() : { swaps: [] },
+          ]);
 
         setStats(statsData);
         setUsers(usersData.users);
         setTotalPages(usersData.pagination.pages);
         setActivity(activityData.activity);
+        setSkillSubmissions(skillsData.skills || []);
+        setSwapRequests(swapsData.swaps || []);
       } catch (err: any) {
         setError(err.message || "Failed to load admin data");
         console.error("Failed to fetch admin data:", err);
@@ -283,27 +358,48 @@ export default function Admin() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="users" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-800/50 border border-gray-600">
+            <TabsList className="grid w-full grid-cols-6 bg-gray-800/50 border border-gray-600">
               <TabsTrigger
                 value="users"
                 className="data-[state=active]:bg-primary"
               >
                 <Users className="w-4 h-4 mr-1" />
-                User Management
+                Users
+              </TabsTrigger>
+              <TabsTrigger
+                value="skills"
+                className="data-[state=active]:bg-primary"
+              >
+                <BookOpen className="w-4 h-4 mr-1" />
+                Skills
+              </TabsTrigger>
+              <TabsTrigger
+                value="swaps"
+                className="data-[state=active]:bg-primary"
+              >
+                <MessageSquare className="w-4 h-4 mr-1" />
+                Swaps
+              </TabsTrigger>
+              <TabsTrigger
+                value="messages"
+                className="data-[state=active]:bg-primary"
+              >
+                <Send className="w-4 h-4 mr-1" />
+                Messages
               </TabsTrigger>
               <TabsTrigger
                 value="activity"
                 className="data-[state=active]:bg-primary"
               >
                 <Activity className="w-4 h-4 mr-1" />
-                Recent Activity
+                Activity
               </TabsTrigger>
               <TabsTrigger
                 value="reports"
                 className="data-[state=active]:bg-primary"
               >
-                <Flag className="w-4 h-4 mr-1" />
-                Content Reports
+                <Download className="w-4 h-4 mr-1" />
+                Reports
               </TabsTrigger>
             </TabsList>
 
