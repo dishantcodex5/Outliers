@@ -38,6 +38,7 @@ export function createServer() {
   app.use("/api/requests", checkDatabaseConnection, requestRoutes);
   app.use("/api/conversations", checkDatabaseConnection, conversationRoutes);
   app.use("/api/skills", checkDatabaseConnection, skillRoutes);
+  app.use("/api/admin", checkDatabaseConnection, adminRoutes);
 
   // Legacy routes
   app.get("/api/ping", (_req, res) => {
