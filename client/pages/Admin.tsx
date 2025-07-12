@@ -768,10 +768,12 @@ export default function Admin() {
                         />
                         <div className="flex-1">
                           <p className="text-white text-sm">
-                            {item.description}
+                            {item.description || "No description"}
                           </p>
                           <p className="text-gray-400 text-xs">
-                            {new Date(item.timestamp).toLocaleString()}
+                            {item.timestamp
+                              ? new Date(item.timestamp).toLocaleString()
+                              : "Unknown time"}
                           </p>
                         </div>
                         {item.status && (
