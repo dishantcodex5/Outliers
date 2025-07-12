@@ -90,10 +90,7 @@ export default function Navigation() {
                     className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-gray-800"
                   >
                     <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src={user?.profilePicture}
-                        alt={user?.name}
-                      />
+                      <AvatarImage src={user?.profilePhoto} alt={user?.name} />
                       <AvatarFallback className="bg-primary text-white text-sm">
                         {user?.avatar}
                       </AvatarFallback>
