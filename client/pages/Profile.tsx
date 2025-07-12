@@ -7,7 +7,10 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StarBorder from "@/components/ui/StarBorder";
 import SkillsManager from "@/components/SkillsManager";
+import ProfileSettings from "@/components/ProfileSettings";
+import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   User,
   Edit3,
