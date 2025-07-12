@@ -483,6 +483,244 @@ const optionalAuth = (req: any, res: Response, next: NextFunction) => {
 router.get("/", optionalAuth, async (req: any, res: Response) => {
   try {
     const { skill, location, page = 1, limit = 20 } = req.query;
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+
+    // Development mode without database - return mock users
+    if (req.noDatabaseConnection) {
+      const mockUsers = [
+        {
+          _id: "mock-user-1",
+          name: "Sarah Johnson",
+          email: "sarah@example.com",
+          location: "San Francisco, CA",
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah`,
+          skillsOffered: [
+            {
+              skill: "React Development",
+              description: "Advanced React patterns and hooks",
+              isApproved: true,
+            },
+            {
+              skill: "UI/UX Design",
+              description: "User interface and experience design",
+              isApproved: true,
+            },
+          ],
+          skillsWanted: [
+            {
+              skill: "Photography",
+              description: "Portrait and landscape photography",
+            },
+            {
+              skill: "Spanish Language",
+              description: "Conversational Spanish",
+            },
+          ],
+          availability: {
+            weekdays: true,
+            weekends: false,
+            mornings: false,
+            afternoons: true,
+            evenings: true,
+          },
+          isPublic: true,
+          profileCompleted: true,
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        },
+        {
+          _id: "mock-user-2",
+          name: "Mike Chen",
+          email: "mike@example.com",
+          location: "New York, NY",
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Mike`,
+          skillsOffered: [
+            {
+              skill: "Photography",
+              description: "Professional photography and editing",
+              isApproved: true,
+            },
+            {
+              skill: "Guitar",
+              description: "Acoustic and electric guitar lessons",
+              isApproved: true,
+            },
+          ],
+          skillsWanted: [
+            {
+              skill: "Web Development",
+              description: "Full-stack web development",
+            },
+            {
+              skill: "Digital Marketing",
+              description: "Social media and content marketing",
+            },
+          ],
+          availability: {
+            weekdays: false,
+            weekends: true,
+            mornings: true,
+            afternoons: false,
+            evenings: true,
+          },
+          isPublic: true,
+          profileCompleted: true,
+          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        },
+        {
+          _id: "mock-user-3",
+          name: "Emma Rodriguez",
+          email: "emma@example.com",
+          location: "Austin, TX",
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Emma`,
+          skillsOffered: [
+            {
+              skill: "Spanish Language",
+              description: "Native Spanish speaker and tutor",
+              isApproved: true,
+            },
+            {
+              skill: "Cooking",
+              description: "Traditional and modern cuisine",
+              isApproved: true,
+            },
+          ],
+          skillsWanted: [
+            {
+              skill: "Programming",
+              description: "Python and JavaScript programming",
+            },
+            { skill: "Graphic Design", description: "Logo and brand design" },
+          ],
+          availability: {
+            weekdays: true,
+            weekends: true,
+            mornings: true,
+            afternoons: false,
+            evenings: false,
+          },
+          isPublic: true,
+          profileCompleted: true,
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+        {
+          _id: "mock-user-4",
+          name: "Alex Thompson",
+          email: "alex@example.com",
+          location: "Seattle, WA",
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Alex`,
+          skillsOffered: [
+            {
+              skill: "Digital Marketing",
+              description: "SEO, SEM, and social media marketing",
+              isApproved: true,
+            },
+            {
+              skill: "Content Writing",
+              description: "Blog posts and copywriting",
+              isApproved: true,
+            },
+          ],
+          skillsWanted: [
+            {
+              skill: "Video Editing",
+              description: "Professional video production",
+            },
+            {
+              skill: "Music Production",
+              description: "Audio recording and mixing",
+            },
+          ],
+          availability: {
+            weekdays: true,
+            weekends: false,
+            mornings: false,
+            afternoons: true,
+            evenings: true,
+          },
+          isPublic: true,
+          profileCompleted: true,
+          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        },
+        {
+          _id: "mock-user-5",
+          name: "Jordan Kim",
+          email: "jordan@example.com",
+          location: "Los Angeles, CA",
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan`,
+          skillsOffered: [
+            {
+              skill: "Video Editing",
+              description: "Professional video production and editing",
+              isApproved: true,
+            },
+            {
+              skill: "Animation",
+              description: "2D and motion graphics animation",
+              isApproved: true,
+            },
+          ],
+          skillsWanted: [
+            {
+              skill: "Data Science",
+              description: "Python data analysis and machine learning",
+            },
+            {
+              skill: "Public Speaking",
+              description: "Presentation and communication skills",
+            },
+          ],
+          availability: {
+            weekdays: false,
+            weekends: true,
+            mornings: false,
+            afternoons: true,
+            evenings: true,
+          },
+          isPublic: true,
+          profileCompleted: true,
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        },
+      ];
+
+      // Filter by skill if provided
+      let filteredUsers = mockUsers;
+      if (skill) {
+        filteredUsers = mockUsers.filter((user) =>
+          user.skillsOffered.some((s) =>
+            s.skill.toLowerCase().includes(skill.toLowerCase()),
+          ),
+        );
+      }
+
+      // Filter by location if provided
+      if (location) {
+        filteredUsers = filteredUsers.filter((user) =>
+          user.location.toLowerCase().includes(location.toLowerCase()),
+        );
+      }
+
+      // Exclude current user if authenticated
+      if (req.user && req.user.id && req.user.id !== "admin-user-fixed") {
+        filteredUsers = filteredUsers.filter(
+          (user) => user._id !== req.user.id,
+        );
+      }
+
+      // Pagination
+      const skip = (pageNum - 1) * limitNum;
+      const paginatedUsers = filteredUsers.slice(skip, skip + limitNum);
+
+      return res.json({
+        users: paginatedUsers,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total: filteredUsers.length,
+          pages: Math.ceil(filteredUsers.length / limitNum),
+        },
+      });
+    }
 
     const query: any = { isPublic: true, profileCompleted: true };
 
@@ -505,8 +743,6 @@ router.get("/", optionalAuth, async (req: any, res: Response) => {
       };
     }
 
-    const pageNum = parseInt(page as string);
-    const limitNum = parseInt(limit as string);
     const skip = (pageNum - 1) * limitNum;
 
     const users = await User.find(query)
