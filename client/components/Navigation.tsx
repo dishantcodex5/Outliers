@@ -23,6 +23,7 @@ import {
   LogOut,
   Settings,
   ChevronDown,
+  MessageCircle,
 } from "lucide-react";
 
 const publicNavItems = [
