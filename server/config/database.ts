@@ -9,6 +9,17 @@ export async function connectDatabase() {
     console.log("✅ Connected to MongoDB");
   } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error);
+
+    // In development, continue without MongoDB for demo purposes
+    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+      console.log("🔄 Running in development mode without MongoDB");
+      console.log("💡 To use full functionality, install and start MongoDB:");
+      console.log("   brew install mongodb/brew/mongodb-community (macOS)");
+      console.log("   sudo apt-get install mongodb (Ubuntu)");
+      console.log("   or use MongoDB Atlas cloud database");
+      return;
+    }
+
     process.exit(1);
   }
 }
