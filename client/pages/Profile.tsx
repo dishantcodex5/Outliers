@@ -684,8 +684,157 @@ export default function Profile() {
                 </Card>
               </div>
             </TabsContent>
+
+            {/* Messages Tab */}
+            <TabsContent value="messages">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-blue-400" />
+                    Recent Conversations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Mock conversations */}
+                  {[
+                    {
+                      id: "1",
+                      name: "Sarah Chen",
+                      avatar: "SC",
+                      lastMessage:
+                        "Thanks for the React session! When can we do the design lesson?",
+                      timestamp: "2 hours ago",
+                      unread: 2,
+                    },
+                    {
+                      id: "2",
+                      name: "Mike Johnson",
+                      avatar: "MJ",
+                      lastMessage:
+                        "Great explanation of Node.js concepts. Really helped!",
+                      timestamp: "1 day ago",
+                      unread: 0,
+                    },
+                    {
+                      id: "3",
+                      name: "Emma Rodriguez",
+                      avatar: "ER",
+                      lastMessage:
+                        "Looking forward to our photography session this weekend",
+                      timestamp: "2 days ago",
+                      unread: 1,
+                    },
+                  ].map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+                      onClick={() => setSelectedChat(conversation.id)}
+                    >
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary to-skill-600 rounded-full flex items-center justify-center">
+                          <span className="text-white font-semibold">
+                            {conversation.avatar}
+                          </span>
+                        </div>
+                        {conversation.unread > 0 && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">
+                              {conversation.unread}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-medium">
+                          {conversation.name}
+                        </h4>
+                        <p className="text-gray-300 text-sm truncate">
+                          {conversation.lastMessage}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-gray-400 text-xs">
+                          {conversation.timestamp}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      View All Conversations
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings">
+              <ProfileSettings
+                onSave={(settings) => console.log("Settings saved:", settings)}
+              />
+            </TabsContent>
           </Tabs>
         </div>
+
+        {/* Chat Interface Dialog */}
+        {selectedChat && user && (
+          <Dialog
+            open={!!selectedChat}
+            onOpenChange={() => setSelectedChat(null)}
+          >
+            <DialogContent className="bg-transparent border-none p-0 max-w-4xl">
+              <ChatInterface
+                currentUser={{
+                  id: user.id,
+                  name: user.name,
+                  avatar: user.avatar,
+                  profilePhoto: user.profilePhoto,
+                  online: true,
+                }}
+                otherUser={{
+                  id: "other-user",
+                  name: "Sarah Chen",
+                  avatar: "SC",
+                  profilePhoto:
+                    "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+                  online: true,
+                  lastSeen: "5 minutes ago",
+                }}
+                messages={[
+                  {
+                    id: "1",
+                    senderId: "other-user",
+                    content:
+                      "Thanks for the React session! When can we do the design lesson?",
+                    timestamp: new Date(
+                      Date.now() - 2 * 60 * 60 * 1000,
+                    ).toISOString(),
+                    type: "text",
+                    status: "read",
+                  },
+                  {
+                    id: "2",
+                    senderId: user.id,
+                    content:
+                      "I'm glad you found it helpful! How about this Thursday at 7 PM for the design session?",
+                    timestamp: new Date(
+                      Date.now() - 1 * 60 * 60 * 1000,
+                    ).toISOString(),
+                    type: "text",
+                    status: "read",
+                  },
+                ]}
+                onSendMessage={handleSendMessage}
+                onScheduleSession={() => console.log("Scheduling session")}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </Layout>
   );
