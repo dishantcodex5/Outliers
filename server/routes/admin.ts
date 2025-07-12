@@ -509,19 +509,96 @@ router.post(
     try {
       const { title, content, type, priority, targetUsers } = req.body;
 
-      // Development mode without database - return mock success
-      if (req.noDatabaseConnection) {
-        return res.json({
-          message: "Platform message sent successfully (development mode)",
-          messageId: "mock-message-" + Date.now(),
+      // Validate required fields
+      if (!title || !content) {
+        return res.status(400).json({
+          error: "Validation failed",
+          message: "Title and content are required",
         });
       }
 
-      // In a real implementation, you'd save the message and send notifications
-      // For now, just return success
+      const messageId = "msg-" + Date.now();
+      const timestamp = new Date().toISOString();
+
+      // In development mode or without database - simulate message sending
+      if (req.noDatabaseConnection) {
+        console.log(`📧 Platform Message Sent (Development Mode):`);
+        console.log(`   Title: ${title}`);
+        console.log(`   Type: ${type}`);
+        console.log(`   Priority: ${priority}`);
+        console.log(`   Target: ${targetUsers}`);
+        console.log(`   Content: ${content}`);
+        console.log(`   Timestamp: ${timestamp}`);
+
+        return res.json({
+          message: "Platform message sent successfully (development mode)",
+          messageId,
+          details: {
+            title,
+            type,
+            priority,
+            targetUsers,
+            timestamp,
+            recipientCount:
+              targetUsers === "all"
+                ? "All users"
+                : targetUsers === "active"
+                  ? "Active users"
+                  : "Inactive users",
+          },
+        });
+      }
+
+      // Real implementation - determine target users
+      let targetUserQuery = {};
+      let recipientCount = 0;
+
+      switch (targetUsers) {
+        case "active":
+          targetUserQuery = { profileCompleted: true };
+          break;
+        case "inactive":
+          targetUserQuery = { profileCompleted: false };
+          break;
+        default: // 'all'
+          targetUserQuery = {};
+      }
+
+      // Get target users count
+      try {
+        recipientCount = await User.countDocuments(targetUserQuery);
+      } catch (error) {
+        console.warn("Could not count users, proceeding anyway:", error);
+        recipientCount = 0;
+      }
+
+      // In a real implementation, you would:
+      // 1. Save the message to a PlatformMessage model
+      // 2. Create notifications for each target user
+      // 3. Send push notifications/emails
+      // 4. Update user notification preferences
+
+      // For now, log the message details
+      console.log(`📧 Platform Message Sent:`);
+      console.log(`   ID: ${messageId}`);
+      console.log(`   Title: ${title}`);
+      console.log(`   Type: ${type}`);
+      console.log(`   Priority: ${priority}`);
+      console.log(`   Target: ${targetUsers} (${recipientCount} users)`);
+      console.log(`   Content: ${content}`);
+      console.log(`   Timestamp: ${timestamp}`);
+
       res.json({
         message: "Platform message sent successfully",
-        messageId: "message-" + Date.now(),
+        messageId,
+        details: {
+          title,
+          type,
+          priority,
+          targetUsers,
+          timestamp,
+          recipientCount,
+        },
       });
     } catch (error) {
       console.error("Send message error:", error);
