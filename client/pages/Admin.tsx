@@ -628,7 +628,7 @@ export default function Admin() {
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
                             <AvatarFallback className="bg-primary text-white">
-                              {user.name
+                              {(user.name || "U")
                                 .split(" ")
                                 .map((n) => n[0])
                                 .join("")
@@ -637,7 +637,7 @@ export default function Admin() {
                           </Avatar>
                           <div>
                             <div className="font-medium text-white flex items-center gap-2">
-                              {user.name}
+                              {user.name || "Unknown User"}
                               {user.role === "admin" && (
                                 <Badge className="bg-red-900/50 text-red-300 border-red-600">
                                   <Shield className="w-3 h-3 mr-1" />
