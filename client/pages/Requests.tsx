@@ -62,6 +62,7 @@ interface RequestsData {
 }
 
 export default function Requests() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [requests, setRequests] = useState<RequestsData>({
     incoming: [],
@@ -70,7 +71,6 @@ export default function Requests() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
   const [acceptMessage, setAcceptMessage] = useState("");
