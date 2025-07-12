@@ -106,11 +106,6 @@ router.post(
       const adminEmail = "admin@skillswap.com";
       const adminPassword = "admin123";
 
-      console.log(`Login attempt - Email: '${email}', Password: '${password}'`);
-      console.log(
-        `Admin check - Email match: ${email.toLowerCase() === adminEmail}, Password match: ${password === adminPassword}`,
-      );
-
       if (
         email.toLowerCase().trim() === adminEmail.toLowerCase() &&
         password.trim() === adminPassword
