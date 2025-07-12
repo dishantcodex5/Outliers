@@ -79,6 +79,114 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch profile data from API
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        // Fetch requests to calculate stats
+        const requestsResponse = await fetch("/api/requests", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (requestsResponse.ok) {
+          const requestsData = await requestsResponse.json();
+          const requests = requestsData.requests;
+
+          // Calculate profile completeness
+          let completeness = 0;
+          if (user.name) completeness += 20;
+          if (user.email) completeness += 10;
+          if (user.location) completeness += 20;
+          if (user.skillsOffered.length > 0) completeness += 25;
+          if (user.skillsWanted.length > 0) completeness += 25;
+
+          // Set stats
+          setStats({
+            rating: 4.5 + Math.random() * 0.5, // Mock rating for now
+            completedExchanges:
+              requests.incoming.filter((r: any) => r.status === "accepted")
+                .length +
+              requests.outgoing.filter((r: any) => r.status === "accepted")
+                .length,
+            profileCompleteness: completeness,
+            requestsReceived: requests.incoming.length,
+            requestsSent: requests.outgoing.length,
+          });
+
+          // Set recent activity from requests
+          const activity: Activity[] = [];
+          requests.incoming.slice(0, 2).forEach((req: any) => {
+            activity.push({
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Received"} exchange request from ${req.from.name}`,
+              date: new Date(req.createdAt).toLocaleDateString(),
+              id: req._id,
+            });
+          });
+          requests.outgoing.slice(0, 1).forEach((req: any) => {
+            activity.push({
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Sent"} exchange request to ${req.to.name}`,
+              date: new Date(req.createdAt).toLocaleDateString(),
+              id: req._id,
+            });
+          });
+          setRecentActivity(activity);
+        }
+
+        // Set achievements based on user data
+        const userAchievements: Achievement[] = [
+          {
+            title: "Profile Complete",
+            description: "Complete your profile setup",
+            earned: user.profileCompleted,
+          },
+          {
+            title: "Skill Teacher",
+            description: "Add skills you can teach",
+            earned: user.skillsOffered.length > 0,
+          },
+          {
+            title: "Skill Learner",
+            description: "Add skills you want to learn",
+            earned: user.skillsWanted.length > 0,
+          },
+          {
+            title: "First Exchange",
+            description: "Complete your first skill exchange",
+            earned: false, // Would need session data
+          },
+          {
+            title: "Active Member",
+            description: "Send or receive multiple requests",
+            earned: false, // Will be updated based on requests
+          },
+        ];
+        setAchievements(userAchievements);
+      } catch (err: any) {
+        setError(err.message || "Failed to load profile data");
+        console.error("Failed to fetch profile data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
+
   if (!user || !localUser) {
     return null; // This should not happen due to protected route
   }
