@@ -2,12 +2,36 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StarBorder from "@/components/ui/StarBorder";
-import { Menu, Search, User, MessageSquare, Star, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Menu,
+  Search,
+  User,
+  MessageSquare,
+  Star,
+  Users,
+  LogOut,
+  Settings,
+  ChevronDown,
+} from "lucide-react";
 
-const navItems = [
+const publicNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
-  { name: "My Profile", path: "/profile", icon: User },
+  { name: "Feedback", path: "/feedback", icon: Star },
+];
+
+const authenticatedNavItems = [
+  { name: "Browse Skills", path: "/browse", icon: Search },
   { name: "Swap Requests", path: "/requests", icon: MessageSquare },
   { name: "Feedback", path: "/feedback", icon: Star },
 ];
@@ -15,8 +39,10 @@ const navItems = [
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
+  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
 
   return (
     <nav className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700 shadow-xl">
