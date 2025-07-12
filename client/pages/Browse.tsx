@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/select";
 import ChromaGrid, { ChromaItem } from "@/components/ChromaGrid";
 import Layout from "@/components/Layout";
-import { Search, Filter, Grid3X3, List, Users, Loader2, AlertCircle } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Users,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 interface User {
   _id: string;
@@ -18,7 +26,11 @@ interface User {
   email: string;
   location: string;
   profilePhoto: string;
-  skillsOffered: Array<{ skill: string; description: string; isApproved: boolean }>;
+  skillsOffered: Array<{
+    skill: string;
+    description: string;
+    isApproved: boolean;
+  }>;
   skillsWanted: Array<{ skill: string; description: string }>;
   availability: {
     weekdays: boolean;
@@ -35,16 +47,19 @@ interface User {
 const convertUserToChromaItem = (user: User): ChromaItem => {
   const availabilityText = () => {
     const times = [];
-    if (user.availability.weekdays) times.push('Weekdays');
-    if (user.availability.weekends) times.push('Weekends');
-    return times.length > 0 ? times.join(', ') : 'Flexible';
+    if (user.availability.weekdays) times.push("Weekdays");
+    if (user.availability.weekends) times.push("Weekends");
+    return times.length > 0 ? times.join(", ") : "Flexible";
   };
 
   return {
     image: user.profilePhoto,
     title: user.name,
-    subtitle: user.skillsOffered.length > 0 ? user.skillsOffered[0].skill : 'Skill Exchanger',
-    handle: `@${user.name.toLowerCase().replace(/\s+/g, '')}`,
+    subtitle:
+      user.skillsOffered.length > 0
+        ? user.skillsOffered[0].skill
+        : "Skill Exchanger",
+    handle: `@${user.name.toLowerCase().replace(/\s+/g, "")}`,
     location: user.location,
     borderColor: "#4F46E5",
     gradient: "linear-gradient(145deg, #4F46E5, #1e293b)",
@@ -52,164 +67,11 @@ const convertUserToChromaItem = (user: User): ChromaItem => {
     rating: 4.5 + Math.random() * 0.5, // Mock rating for now
     reviews: Math.floor(Math.random() * 50) + 5,
     isOnline: Math.random() > 0.5,
-    skillsOffered: user.skillsOffered.map(s => s.skill),
-    skillsWanted: user.skillsWanted.map(s => s.skill),
+    skillsOffered: user.skillsOffered.map((s) => s.skill),
+    skillsWanted: user.skillsWanted.map((s) => s.skill),
     availability: availabilityText(),
   };
-  {
-    image: "https://i.pravatar.cc/300?img=2",
-    title: "Sarah Martinez",
-    subtitle: "UI/UX Designer",
-    handle: "@sarahdesigns",
-    location: "New York, NY",
-    borderColor: "#10B981",
-    gradient: "linear-gradient(210deg, #10B981, #1e293b)",
-    url: "https://dribbble.com/sarahdesigns",
-    rating: 5.0,
-    reviews: 31,
-    isOnline: false,
-    skillsOffered: [
-      "Graphic Design",
-      "Adobe Creative Suite",
-      "Branding",
-      "Prototyping",
-    ],
-    skillsWanted: ["Python", "Data Analysis", "Machine Learning"],
-    availability: "Evenings",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=3",
-    title: "David Kim",
-    subtitle: "Photographer & Editor",
-    handle: "@davidkim_photo",
-    location: "Remote",
-    borderColor: "#F59E0B",
-    gradient: "linear-gradient(165deg, #F59E0B, #1e293b)",
-    url: "https://unsplash.com/@davidkim",
-    rating: 4.8,
-    reviews: 18,
-    isOnline: true,
-    skillsOffered: [
-      "Photography",
-      "Video Editing",
-      "Lightroom",
-      "Premiere Pro",
-    ],
-    skillsWanted: ["Web Development", "SEO", "Digital Marketing"],
-    availability: "Flexible",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=4",
-    title: "Emily Chen",
-    subtitle: "Content Strategist",
-    handle: "@emilychen_writes",
-    location: "Los Angeles, CA",
-    borderColor: "#EF4444",
-    gradient: "linear-gradient(195deg, #EF4444, #1e293b)",
-    url: "https://medium.com/@emilychen",
-    rating: 4.7,
-    reviews: 15,
-    isOnline: true,
-    skillsOffered: [
-      "Content Writing",
-      "Copywriting",
-      "SEO",
-      "Content Strategy",
-    ],
-    skillsWanted: ["Social Media Marketing", "Analytics", "Paid Advertising"],
-    availability: "Weekdays",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=5",
-    title: "Michael Rodriguez",
-    subtitle: "Digital Marketing Expert",
-    handle: "@mikemarketing",
-    location: "Chicago, IL",
-    borderColor: "#8B5CF6",
-    gradient: "linear-gradient(225deg, #8B5CF6, #1e293b)",
-    url: "https://linkedin.com/in/mikemarketing",
-    rating: 4.9,
-    reviews: 27,
-    isOnline: false,
-    skillsOffered: [
-      "Digital Marketing",
-      "Google Ads",
-      "Analytics",
-      "Email Marketing",
-    ],
-    skillsWanted: ["Graphic Design", "Video Production", "Animation"],
-    availability: "Weekends",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=6",
-    title: "Jessica Wang",
-    subtitle: "Product Designer",
-    handle: "@jessicawang_ux",
-    location: "Seattle, WA",
-    borderColor: "#06B6D4",
-    gradient: "linear-gradient(135deg, #06B6D4, #1e293b)",
-    url: "https://behance.net/jessicawang",
-    rating: 5.0,
-    reviews: 42,
-    isOnline: true,
-    skillsOffered: ["UI/UX Design", "Figma", "Prototyping", "User Research"],
-    skillsWanted: ["React Native", "Mobile Development", "Flutter"],
-    availability: "Evenings",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=7",
-    title: "Carlos Lopez",
-    subtitle: "Backend Developer",
-    handle: "@carlosdev",
-    location: "Austin, TX",
-    borderColor: "#F97316",
-    gradient: "linear-gradient(155deg, #F97316, #1e293b)",
-    url: "https://github.com/carlosdev",
-    rating: 4.6,
-    reviews: 19,
-    isOnline: true,
-    skillsOffered: ["Python", "Django", "PostgreSQL", "Docker"],
-    skillsWanted: ["React", "Vue.js", "Frontend Architecture"],
-    availability: "Flexible",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=8",
-    title: "Nina Patel",
-    subtitle: "Data Scientist",
-    handle: "@nina_data",
-    location: "Boston, MA",
-    borderColor: "#EC4899",
-    gradient: "linear-gradient(175deg, #EC4899, #1e293b)",
-    url: "https://kaggle.com/ninadata",
-    rating: 4.8,
-    reviews: 33,
-    isOnline: false,
-    skillsOffered: [
-      "Machine Learning",
-      "Python",
-      "TensorFlow",
-      "Data Visualization",
-    ],
-    skillsWanted: ["Web Development", "Cloud Architecture", "DevOps"],
-    availability: "Weekdays",
-  },
-  {
-    image: "https://i.pravatar.cc/300?img=9",
-    title: "Ryan O'Connor",
-    subtitle: "Mobile Developer",
-    handle: "@ryanoconnor_dev",
-    location: "Portland, OR",
-    borderColor: "#84CC16",
-    gradient: "linear-gradient(185deg, #84CC16, #1e293b)",
-    url: "https://github.com/ryanoconnor",
-    rating: 4.7,
-    reviews: 21,
-    isOnline: true,
-    skillsOffered: ["React Native", "Swift", "Kotlin", "Firebase"],
-    skillsWanted: ["Backend Development", "API Design", "System Architecture"],
-    availability: "Evenings",
-  },
-];
+};
 
 export default function Browse() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -217,6 +79,37 @@ export default function Browse() {
   const [availabilityFilter, setAvailabilityFilter] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch users from API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const params = new URLSearchParams();
+        if (searchTerm) params.append("skill", searchTerm);
+        if (locationFilter) params.append("location", locationFilter);
+
+        const response = await fetch(`/api/users?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const data = await response.json();
+        setUsers(data.users || []);
+      } catch (err: any) {
+        setError(err.message || "Failed to load users");
+        console.error("Failed to fetch users:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(fetchUsers, 300); // Debounce search
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, locationFilter]);
 
   // Filter users based on search criteria
   const filteredUsers = users.filter((user) => {
