@@ -552,7 +552,15 @@ export default function UserProfile() {
         </div>
 
         {/* Send Request Dialog */}
-        <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
+        <Dialog
+          open={showRequestDialog}
+          onOpenChange={(open) => {
+            setShowRequestDialog(open);
+            if (!open) {
+              setRequestError(null);
+            }
+          }}
+        >
           <DialogContent className="bg-gray-800 border-gray-600 text-white">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
