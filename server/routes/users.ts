@@ -1,7 +1,8 @@
-import { Router, Response } from "express";
+import { Router, Response, Request, NextFunction } from "express";
 import { User } from "../models/User";
 import { authenticateToken, AuthenticatedRequest } from "../middleware/auth";
 import { validateRequest } from "../middleware/validation";
+import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -458,8 +459,28 @@ router.get("/:id", async (req, res: Response) => {
   }
 });
 
+// Optional authentication middleware - adds user info if token is present
+const optionalAuth = (req: any, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "fallback-secret",
+      ) as any;
+      req.user = { id: decoded.userId, email: decoded.email };
+    } catch (error) {
+      // Token is invalid but don't fail the request
+    }
+  }
+
+  next();
+};
+
 // Search users by skills
-router.get("/", async (req: any, res: Response) => {
+router.get("/", optionalAuth, async (req: any, res: Response) => {
   try {
     const { skill, location, page = 1, limit = 20 } = req.query;
 
