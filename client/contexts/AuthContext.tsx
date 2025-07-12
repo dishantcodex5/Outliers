@@ -92,6 +92,7 @@ const mockUser: User = {
   isPublic: true,
   role: "user",
   avatar: "AT",
+  profileCompleted: true, // Mock user has completed profile
   createdAt: "2024-01-01T00:00:00Z",
   updatedAt: "2024-01-15T12:00:00Z",
 };
