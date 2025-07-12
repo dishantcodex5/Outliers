@@ -41,48 +41,43 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-// Mock additional data not in user schema
-const mockStats = {
-  rating: 4.8,
-  completedExchanges: 24,
-  profileCompleteness: 85,
-};
+interface ProfileStats {
+  rating: number;
+  completedExchanges: number;
+  profileCompleteness: number;
+  requestsReceived: number;
+  requestsSent: number;
+}
 
-const recentActivity = [
-  {
-    type: "completed",
-    title: "React Hooks session with Sarah",
-    date: "2 days ago",
-  },
-  {
-    type: "upcoming",
-    title: "Node.js basics with Mike",
-    date: "Tomorrow, 3 PM",
-  },
-  {
-    type: "completed",
-    title: "Spanish conversation with Maria",
-    date: "1 week ago",
-  },
-];
+interface Activity {
+  type: "completed" | "upcoming" | "request";
+  title: string;
+  date: string;
+  id?: string;
+}
 
-const achievements = [
-  {
-    title: "First Exchange",
-    description: "Completed your first skill exchange",
-    earned: true,
-  },
-  { title: "Teacher", description: "Taught 10+ sessions", earned: true },
-  { title: "Student", description: "Learned 5+ skills", earned: true },
-  { title: "Highly Rated", description: "Maintain 4.5+ rating", earned: true },
-  { title: "Mentor", description: "Teach 25+ sessions", earned: false },
-];
+interface Achievement {
+  title: string;
+  description: string;
+  earned: boolean;
+}
 
 export default function Profile() {
   const { user } = useAuth();
   const [localUser, setLocalUser] = useState(user);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [stats, setStats] = useState<ProfileStats>({
+    rating: 0,
+    completedExchanges: 0,
+    profileCompleteness: 0,
+    requestsReceived: 0,
+    requestsSent: 0,
+  });
+  const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   if (!user || !localUser) {
     return null; // This should not happen due to protected route
