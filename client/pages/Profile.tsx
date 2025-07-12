@@ -64,11 +64,39 @@ const achievements = [
 ];
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const [localUser, setLocalUser] = useState(user);
 
-  if (!user) {
+  if (!user || !localUser) {
     return null; // This should not happen due to protected route
   }
+
+  const handleAddTeachingSkill = (skill: {
+    skill: string;
+    description: string;
+    isApproved?: boolean;
+  }) => {
+    const updatedUser = {
+      ...localUser,
+      skillsOffered: [...localUser.skillsOffered, skill],
+    };
+    setLocalUser(updatedUser);
+    // In a real app, this would make an API call to update the user
+    console.log("Added teaching skill:", skill);
+  };
+
+  const handleAddLearningSkill = (skill: {
+    skill: string;
+    description: string;
+  }) => {
+    const updatedUser = {
+      ...localUser,
+      skillsWanted: [...localUser.skillsWanted, skill],
+    };
+    setLocalUser(updatedUser);
+    // In a real app, this would make an API call to update the user
+    console.log("Added learning skill:", skill);
+  };
 
   const getAvailabilityText = () => {
     const times = [];
