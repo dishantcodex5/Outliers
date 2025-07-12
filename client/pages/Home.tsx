@@ -130,7 +130,6 @@ export default function Home() {
                 speed="3s"
               >
                 Get Started
-                <ArrowRight className="ml-3 w-6 h-6" />
               </StarBorder>
             </Link>
             <Link to="/browse">
