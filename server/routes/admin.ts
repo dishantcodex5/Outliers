@@ -119,8 +119,11 @@ router.get(
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limit as string);
 
+      // Check database availability
+      const dbAvailable = await isDatabaseAvailable();
+
       // Development mode without database - return mock users
-      if (req.noDatabaseConnection) {
+      if (!dbAvailable || req.noDatabaseConnection) {
         const mockUsers = [
           {
             _id: "mock-user-1",
