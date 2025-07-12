@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ import {
   BarChart3,
   BookOpen,
   Trophy,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 // Mock additional data not in user schema
