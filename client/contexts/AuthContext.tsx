@@ -167,7 +167,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(userData),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error("Invalid response from server");
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Signup failed");
