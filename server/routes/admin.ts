@@ -98,11 +98,52 @@ router.get(
   "/users",
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: any, res: Response) => {
     try {
       const { page = 1, limit = 20, search = "" } = req.query;
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limit as string);
+
+      // Development mode without database - return mock users
+      if (req.noDatabaseConnection) {
+        const mockUsers = [
+          {
+            _id: "mock-user-1",
+            name: "John Doe",
+            email: "john@example.com",
+            role: "user",
+            profileCompleted: true,
+            createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          },
+          {
+            _id: "mock-user-2",
+            name: "Jane Smith",
+            email: "jane@example.com",
+            role: "user",
+            profileCompleted: false,
+            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          },
+          {
+            _id: "mock-user-3",
+            name: "Mike Johnson",
+            email: "mike@example.com",
+            role: "user",
+            profileCompleted: true,
+            createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+          },
+        ];
+
+        return res.json({
+          users: mockUsers,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total: mockUsers.length,
+            pages: Math.ceil(mockUsers.length / limitNum),
+          },
+        });
+      }
+
       const skip = (pageNum - 1) * limitNum;
 
       let query: any = {};
