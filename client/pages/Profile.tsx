@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StarBorder from "@/components/ui/StarBorder";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   User,
   Edit3,
@@ -12,36 +13,23 @@ import {
   Clock,
   MapPin,
   Mail,
-  Phone,
   Calendar,
   Award,
   TrendingUp,
-  MessageSquare,
   Heart,
   CheckCircle,
+  Shield,
+  Eye,
+  EyeOff,
+  Globe,
 } from "lucide-react";
 
-// Mock user data
-const userData = {
-  name: "Alex Thompson",
-  email: "alex.thompson@email.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  joinDate: "January 2024",
+// Mock additional data not in user schema
+const mockStats = {
   rating: 4.8,
   completedExchanges: 24,
   profileCompleteness: 85,
-  bio: "Full-stack developer with 5+ years of experience. Passionate about teaching and learning new technologies. Love to share knowledge about React, Node.js, and cloud architecture.",
-  avatar: "AT",
 };
-
-const skills = [
-  { name: "React Development", level: 95, category: "Teaching", sessions: 12 },
-  { name: "Node.js", level: 90, category: "Teaching", sessions: 8 },
-  { name: "Spanish Language", level: 85, category: "Teaching", sessions: 6 },
-  { name: "Photography", level: 70, category: "Learning", sessions: 4 },
-  { name: "Graphic Design", level: 60, category: "Learning", sessions: 3 },
-];
 
 const recentActivity = [
   {
@@ -74,6 +62,27 @@ const achievements = [
 ];
 
 export default function Profile() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return null; // This should not happen due to protected route
+  }
+
+  const getAvailabilityText = () => {
+    const times = [];
+    const days = [];
+
+    if (user.availability.weekdays) days.push("Weekdays");
+    if (user.availability.weekends) days.push("Weekends");
+    if (user.availability.mornings) times.push("Mornings");
+    if (user.availability.afternoons) times.push("Afternoons");
+    if (user.availability.evenings) times.push("Evenings");
+
+    const dayText = days.length > 0 ? days.join(", ") : "No days set";
+    const timeText = times.length > 0 ? times.join(", ") : "No times set";
+
+    return `${dayText} - ${timeText}`;
+  };
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
