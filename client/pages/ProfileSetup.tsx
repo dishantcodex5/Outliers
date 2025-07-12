@@ -104,13 +104,20 @@ export default function ProfileSetup() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call to update user profile
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Update user profile with collected data
+      await updateUser({
+        location: formData.location,
+        skillsOffered: formData.skillsOffered.map((skill) => ({
+          ...skill,
+          isApproved: true,
+        })),
+        skillsWanted: formData.skillsWanted,
+        availability: formData.availability,
+        isPublic: formData.isPublic,
+        profileCompleted: true,
+      });
 
-      // In a real app, this would update the user in the backend
-      console.log("Profile setup completed:", formData);
-
-      // Mark profile as complete and redirect
+      // Redirect to profile page
       navigate("/profile");
     } catch (error) {
       console.error("Failed to complete profile setup:", error);
