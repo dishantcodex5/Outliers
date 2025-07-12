@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import ProfileSetup from "./pages/ProfileSetup";
 import Requests from "./pages/Requests";
+import Conversations from "./pages/Conversations";
 import Feedback from "./pages/Feedback";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
