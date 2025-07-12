@@ -462,7 +462,7 @@ export default function Admin() {
               <span className="ml-2 text-gray-300">Loading admin data...</span>
             </div>
           ) : stats ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
               <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <Users className="w-8 h-8 text-primary mx-auto mb-2" />
