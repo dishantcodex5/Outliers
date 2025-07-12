@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import StarBorder from "@/components/ui/StarBorder";
+import Hyperspeed from "@/components/Hyperspeed";
+import { hyperspeedPresets } from "@/components/HyperspeedPresets";
 import Layout from "@/components/Layout";
 import {
   Users,
@@ -94,76 +96,87 @@ const features = [
 export default function Home() {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Exchange Skills,
-              <span className="bg-gradient-to-r from-primary to-skill-400 bg-clip-text text-transparent">
-                {" "}
-                Grow Together
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Connect with like-minded individuals and trade your expertise.
-              Learn something new while sharing your knowledge with others in
-              our thriving community.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-              <Link to="/signup">
-                <StarBorder
-                  className="text-lg px-8 py-6"
-                  color="#a855f7"
-                  speed="4s"
-                >
-                  Get Started
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </StarBorder>
-              </Link>
-              <Link to="/browse">
-                <StarBorder
-                  className="text-lg px-8 py-6"
-                  color="#64748b"
-                  speed="6s"
-                >
-                  Browse Skills
-                </StarBorder>
-              </Link>
-            </div>
+      {/* Hero Section with Hyperspeed Background */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Hyperspeed Background */}
+        <div className="absolute inset-0 z-0">
+          <Hyperspeed effectOptions={hyperspeedPresets.one} />
+        </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">1,200+</div>
-                <div className="text-gray-400">Active Users</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">450+</div>
-                <div className="text-gray-400">Skills Available</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">2,800+</div>
-                <div className="text-gray-400">Successful Swaps</div>
-              </div>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80 z-10"></div>
+
+        {/* Hero Content */}
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            Exchange Skills,
+            <span className="bg-gradient-to-r from-primary to-skill-400 bg-clip-text text-transparent">
+              {" "}
+              Grow Together
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed">
+            Connect with like-minded individuals and trade your expertise. Learn
+            something new while sharing your knowledge with others in our
+            thriving community.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+            <Link to="/signup">
+              <StarBorder
+                className="text-xl px-10 py-8 font-semibold"
+                color="#a855f7"
+                speed="3s"
+              >
+                Get Started
+                <ArrowRight className="ml-3 w-6 h-6" />
+              </StarBorder>
+            </Link>
+            <Link to="/browse">
+              <StarBorder
+                className="text-xl px-10 py-8 font-semibold"
+                color="#64748b"
+                speed="5s"
+              >
+                Browse Skills
+              </StarBorder>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+              <div className="text-4xl font-bold text-primary mb-2">1,200+</div>
+              <div className="text-gray-200 text-lg">Active Users</div>
+            </div>
+            <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+              <div className="text-4xl font-bold text-primary mb-2">450+</div>
+              <div className="text-gray-200 text-lg">Skills Available</div>
+            </div>
+            <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+              <div className="text-4xl font-bold text-primary mb-2">2,800+</div>
+              <div className="text-gray-200 text-lg">Successful Swaps</div>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+              <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
             </div>
           </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-primary/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-skill-600/30 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-blue-500/10 rounded-full blur-lg"></div>
       </section>
 
       {/* Featured Skills */}
-      <section className="py-16 bg-gray-800">
+      <section className="py-20 bg-gray-800 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-6">
               Popular Skills on SkillSwap
             </h2>
-            <p className="text-lg text-gray-300">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Discover the most sought-after skills in our community
             </p>
           </div>
@@ -172,7 +185,7 @@ export default function Home() {
             {featuredSkills.map((skill) => (
               <Card
                 key={skill.name}
-                className="hover:shadow-xl transition-all duration-300 cursor-pointer bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-primary/50"
+                className="hover:shadow-xl transition-all duration-300 cursor-pointer bg-gray-700/80 backdrop-blur-sm border-gray-600 hover:bg-gray-600 hover:border-primary/50 hover:scale-105"
               >
                 <CardContent className="p-6 text-center">
                   <skill.icon className="w-8 h-8 text-primary mx-auto mb-3" />
@@ -191,13 +204,13 @@ export default function Home() {
       </section>
 
       {/* How it Works */}
-      <section className="py-16 bg-gray-900">
+      <section className="py-20 bg-gray-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-6">
               How SkillSwap Works
             </h2>
-            <p className="text-lg text-gray-300">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Simple steps to start exchanging skills today
             </p>
           </div>
@@ -206,16 +219,18 @@ export default function Home() {
             {features.map((feature, index) => (
               <Card
                 key={feature.title}
-                className="text-center border-gray-600 shadow-lg bg-gray-800 hover:bg-gray-700 transition-all duration-300 hover:border-primary/50"
+                className="text-center border-gray-600 shadow-lg bg-gray-800/80 backdrop-blur-sm hover:bg-gray-700 transition-all duration-300 hover:border-primary/50 hover:scale-105"
               >
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                <CardContent className="p-8">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <feature.icon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
+                  <h3 className="text-xl font-semibold text-white mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-300">{feature.description}</p>
+                  <p className="text-gray-300 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -224,13 +239,13 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-800">
+      <section className="py-20 bg-gray-800 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-6">
               Success Stories
             </h2>
-            <p className="text-lg text-gray-300">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Hear from our community members who found value in skill exchange
             </p>
           </div>
@@ -239,15 +254,15 @@ export default function Home() {
             {testimonials.map((testimonial) => (
               <Card
                 key={testimonial.name}
-                className="shadow-lg bg-gray-700 border-gray-600 hover:bg-gray-600 transition-all duration-300"
+                className="shadow-xl bg-gray-700/80 backdrop-blur-sm border-gray-600 hover:bg-gray-600 transition-all duration-300 hover:scale-105"
               >
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-skill-600 text-white rounded-full flex items-center justify-center font-semibold mr-3">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-skill-600 text-white rounded-full flex items-center justify-center font-semibold text-lg mr-4">
                       {testimonial.avatar}
                     </div>
                     <div>
-                      <h4 className="font-medium text-white">
+                      <h4 className="font-semibold text-white text-lg">
                         {testimonial.name}
                       </h4>
                       <div className="flex items-center">
@@ -260,11 +275,13 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-gray-300 mb-3">"{testimonial.comment}"</p>
+                  <p className="text-gray-300 mb-4 text-lg leading-relaxed">
+                    "{testimonial.comment}"
+                  </p>
                   <div className="text-sm text-gray-400">
                     <span className="text-green-400 font-medium">Learned:</span>{" "}
-                    {testimonial.skill} •
-                    <span className="text-blue-400 font-medium"> Taught:</span>{" "}
+                    {testimonial.skill} •{" "}
+                    <span className="text-blue-400 font-medium">Taught:</span>{" "}
                     {testimonial.traded}
                   </div>
                 </CardContent>
@@ -275,31 +292,31 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary via-skill-600 to-primary relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-r from-primary via-skill-600 to-primary relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-white mb-6">
             Ready to Start Your Skill Journey?
           </h2>
-          <p className="text-xl text-white/80 mb-8">
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
             Join thousands of learners and teachers in our growing community
           </p>
           <Link to="/signup">
             <StarBorder
-              className="text-lg px-8 py-6 inline-block"
+              className="text-xl px-10 py-8 font-semibold inline-block"
               color="#ffffff"
-              speed="3s"
+              speed="2s"
             >
-              <span className="text-white font-medium">
+              <span className="text-white">
                 Create Your Profile
-                <ArrowRight className="ml-2 w-5 h-5 inline" />
+                <ArrowRight className="ml-3 w-6 h-6 inline" />
               </span>
             </StarBorder>
           </Link>
         </div>
 
         {/* Additional decorative elements */}
-        <div className="absolute top-4 right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-4 left-4 w-16 h-16 bg-white/5 rounded-full blur-lg"></div>
+        <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-8 left-8 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
       </section>
     </Layout>
   );
