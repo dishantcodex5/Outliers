@@ -823,21 +823,23 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h4 className="text-white font-medium">
-                              {skill.skill}
+                              {skill.skill || "Unknown Skill"}
                             </h4>
                             <Badge className="bg-yellow-900/50 text-yellow-300 border-yellow-600">
                               Pending Review
                             </Badge>
                           </div>
                           <p className="text-gray-300 text-sm mb-2">
-                            {skill.description}
+                            {skill.description || "No description provided"}
                           </p>
                           <p className="text-gray-400 text-xs">
                             Submitted by: {skill.user?.name || "Unknown"} (
                             {skill.user?.email || "Unknown"})
                           </p>
                           <p className="text-gray-500 text-xs">
-                            {new Date(skill.createdAt).toLocaleString()}
+                            {skill.createdAt
+                              ? new Date(skill.createdAt).toLocaleString()
+                              : "Unknown date"}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
