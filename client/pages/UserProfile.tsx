@@ -441,7 +441,10 @@ export default function UserProfile() {
                     <>
                       <StarBorder as="div" color="#60a5fa" speed="5s">
                         <Button
-                          onClick={() => setShowRequestDialog(true)}
+                          onClick={() => {
+                            setRequestError(null);
+                            setShowRequestDialog(true);
+                          }}
                           className="bg-transparent border-none p-0 h-auto font-medium"
                         >
                           <Send className="w-4 h-4 mr-2" />
