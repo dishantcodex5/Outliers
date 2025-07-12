@@ -1,51 +1,65 @@
 .star-border-container {
   display: inline-block;
   position: relative;
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .border-gradient-bottom {
   position: absolute;
-  width: 300%;
-  height: 50%;
-  opacity: 0.7;
-  bottom: -12px;
-  right: -250%;
+  width: 400%;
+  height: 60%;
+  opacity: 0.8;
+  bottom: -15px;
+  right: -300%;
   border-radius: 50%;
   animation: star-movement-bottom linear infinite alternate;
   z-index: 0;
+  filter: blur(1px);
 }
 
 .border-gradient-top {
   position: absolute;
-  opacity: 0.7;
-  width: 300%;
-  height: 50%;
-  top: -12px;
-  left: -250%;
+  opacity: 0.8;
+  width: 400%;
+  height: 60%;
+  top: -15px;
+  left: -300%;
   border-radius: 50%;
   animation: star-movement-top linear infinite alternate;
   z-index: 0;
+  filter: blur(1px);
 }
 
 .inner-content {
   position: relative;
   border: 1px solid #374151;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   color: white;
   font-size: 16px;
+  font-weight: 500;
   text-align: center;
-  padding: 16px 26px;
-  border-radius: 20px;
+  padding: 16px 28px;
+  border-radius: 22px;
   z-index: 1;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .star-border-container:hover .inner-content {
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.2);
+  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 15px 35px rgba(168, 85, 247, 0.25),
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.star-border-container:active .inner-content {
+  transform: translateY(-1px) scale(1.01);
+  transition: all 0.1s ease;
 }
 
 @keyframes star-movement-bottom {
