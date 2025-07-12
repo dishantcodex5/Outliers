@@ -133,16 +133,16 @@ export default function Profile() {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg border-2 border-primary/20">
-                  {user.profilePhoto ? (
+                  {localUser.profilePhoto ? (
                     <img
-                      src={user.profilePhoto}
-                      alt={user.name}
+                      src={localUser.profilePhoto}
+                      alt={localUser.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary to-skill-600 flex items-center justify-center">
                       <span className="text-2xl font-bold text-white">
-                        {user.avatar}
+                        {localUser.avatar}
                       </span>
                     </div>
                   )}
@@ -151,7 +151,7 @@ export default function Profile() {
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
                     <h2 className="text-3xl font-bold text-white">
-                      {user.name}
+                      {localUser.name}
                     </h2>
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
@@ -163,7 +163,7 @@ export default function Profile() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {user.role === "admin" && (
+                      {localUser.role === "admin" && (
                         <Badge className="bg-red-900/50 text-red-300 border-red-600">
                           <Shield className="w-3 h-3 mr-1" />
                           Admin
@@ -171,17 +171,17 @@ export default function Profile() {
                       )}
                       <Badge
                         className={
-                          user.isPublic
+                          localUser.isPublic
                             ? "bg-green-900/50 text-green-300 border-green-600"
                             : "bg-gray-900/50 text-gray-300 border-gray-600"
                         }
                       >
-                        {user.isPublic ? (
+                        {localUser.isPublic ? (
                           <Eye className="w-3 h-3 mr-1" />
                         ) : (
                           <EyeOff className="w-3 h-3 mr-1" />
                         )}
-                        {user.isPublic ? "Public" : "Private"}
+                        {localUser.isPublic ? "Public" : "Private"}
                       </Badge>
                     </div>
                   </div>
@@ -189,22 +189,22 @@ export default function Profile() {
                   <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
                     <div className="flex items-center gap-1">
                       <Mail className="w-4 h-4" />
-                      {user.email}
+                      {localUser.email}
                     </div>
-                    {user.location && (
+                    {localUser.location && (
                       <div className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
-                        {user.location}
+                        {localUser.location}
                       </div>
                     )}
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       Joined{" "}
-                      {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                            month: "long",
-                            year: "numeric",
-                          })
+                      {localUser.createdAt
+                        ? new Date(localUser.createdAt).toLocaleDateString(
+                            "en-US",
+                            { month: "long", year: "numeric" },
+                          )
                         : "Recently"}
                     </div>
                   </div>
