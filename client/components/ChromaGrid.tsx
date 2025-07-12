@@ -189,9 +189,11 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
     });
   };
 
-  const handleCardClick = (url?: string) => {
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+  const handleCardClick = (item: ChromaItem) => {
+    if (item.onClick) {
+      item.onClick();
+    } else if (item.url) {
+      window.open(item.url, "_blank", "noopener,noreferrer");
     }
   };
 
