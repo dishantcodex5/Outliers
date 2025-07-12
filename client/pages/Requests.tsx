@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
+  Loader2,
 } from "lucide-react";
 
 // Mock data for swap requests
