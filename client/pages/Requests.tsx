@@ -162,21 +162,37 @@ export default function Requests() {
   const handleRejectRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      // Update request status
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/requests/${requestId}/reject`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reason: rejectReason }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reject request");
+      }
+
+      // Update local state
       setRequests((prev) => ({
         ...prev,
         incoming: prev.incoming.map((req) =>
-          req.id === requestId ? { ...req, status: "rejected" } : req,
+          req._id === requestId ? { ...req, status: "rejected" as const } : req,
         ),
       }));
 
-      // Close dialog
       setShowRejectDialog(null);
       setRejectReason("");
-
-      // Show success notification
       console.log("Request rejected successfully");
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || "Failed to reject request");
       console.error("Failed to reject request:", error);
     } finally {
       setIsProcessing(false);
