@@ -6,6 +6,7 @@ import { userRoutes } from "./routes/users";
 import { requestRoutes } from "./routes/requests";
 import { conversationRoutes } from "./routes/conversations";
 import { skillRoutes } from "./routes/skills";
+import { adminRoutes } from "./routes/admin";
 import { handleDemo } from "./routes/demo";
 import { checkDatabaseConnection } from "./middleware/database";
 
