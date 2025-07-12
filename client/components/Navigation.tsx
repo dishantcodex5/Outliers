@@ -33,7 +33,7 @@ const publicNavItems = [
 const authenticatedNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
   { name: "Swap Requests", path: "/requests", icon: MessageSquare },
-  { name: "Conversations", path: "/conversations", icon: Users },
+  { name: "Conversations", path: "/conversations", icon: MessageCircle },
 ];
 
 export default function Navigation() {
