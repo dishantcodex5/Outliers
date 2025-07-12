@@ -17,6 +17,18 @@ const requireAdmin = (req: AuthenticatedRequest, res: Response, next: any) => {
   next();
 };
 
+// Helper function to detect database connection issues
+const isDatabaseAvailable = async () => {
+  try {
+    // Try a simple database operation
+    await User.countDocuments().limit(1);
+    return true;
+  } catch (error) {
+    console.log("Database not available, using development mode");
+    return false;
+  }
+};
+
 // Get admin dashboard stats
 router.get(
   "/stats",
