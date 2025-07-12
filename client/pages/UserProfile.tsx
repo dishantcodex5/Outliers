@@ -328,7 +328,7 @@ export default function UserProfile() {
                 <div className="flex flex-col gap-3">
                   {currentUser && currentUser.id !== userData._id && (
                     <>
-                      <StarBorder color="#60a5fa" speed="5s">
+                      <StarBorder as="div" color="#60a5fa" speed="5s">
                         <Button
                           onClick={() => setShowRequestDialog(true)}
                           className="bg-transparent border-none p-0 h-auto font-medium"
