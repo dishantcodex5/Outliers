@@ -165,17 +165,20 @@ export default function Browse() {
         setError(errorMessage);
         console.error("Failed to fetch users:", err);
 
-        // Auto-retry on certain errors (up to 2 times)
+        // Auto-retry on network errors and certain recoverable errors (up to 3 times)
         if (
-          retryCount < 2 &&
-          (errorMessage.includes("endpoint not found") ||
+          retryCount < 3 &&
+          (errorMessage.includes("Network error") ||
+            errorMessage.includes("Request timed out") ||
+            errorMessage.includes("endpoint not found") ||
             errorMessage.includes("Invalid response"))
         ) {
-          console.log(`Retrying user fetch (attempt ${retryCount + 1}/2)...`);
+          console.log(`Retrying user fetch (attempt ${retryCount + 1}/3)...`);
           setRetryCount((prev) => prev + 1);
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Exponential backoff
           setTimeout(() => {
             fetchUsers();
-          }, 1000);
+          }, delay);
           return;
         }
       } finally {
