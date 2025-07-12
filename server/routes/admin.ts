@@ -200,6 +200,19 @@ router.put(
         });
       }
 
+      // Development mode without database - return mock success
+      if ((req as any).noDatabaseConnection) {
+        return res.json({
+          message: `User ${status === "banned" ? "banned" : "unbanned"} successfully (development mode)`,
+          user: {
+            _id: id,
+            name: "Mock User",
+            email: "mock@example.com",
+            status: status,
+          },
+        });
+      }
+
       const user = await User.findById(id);
       if (!user) {
         return res.status(404).json({
