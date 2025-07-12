@@ -268,31 +268,49 @@ export default function Profile() {
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-green-400" />
-                      Teaching Skills
+                      Skills I Teach ({user.skillsOffered.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {skills
-                      .filter((skill) => skill.category === "Teaching")
-                      .map((skill, index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-white font-medium">
-                              {skill.name}
-                            </span>
+                    {user.skillsOffered.length > 0 ? (
+                      user.skillsOffered.map((skill, index) => (
+                        <div
+                          key={index}
+                          className="space-y-2 p-3 bg-gray-700/50 rounded-lg"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="text-white font-medium">
+                                {skill.skill}
+                              </h4>
+                              {skill.description && (
+                                <p className="text-gray-300 text-sm mt-1">
+                                  {skill.description}
+                                </p>
+                              )}
+                            </div>
                             <Badge
                               variant="secondary"
-                              className="bg-green-900/50 text-green-300"
+                              className={
+                                skill.isApproved
+                                  ? "bg-green-900/50 text-green-300 border-green-600"
+                                  : "bg-yellow-900/50 text-yellow-300 border-yellow-600"
+                              }
                             >
-                              {skill.sessions} sessions
+                              {skill.isApproved ? "Approved" : "Pending"}
                             </Badge>
                           </div>
-                          <Progress value={skill.level} className="h-2" />
-                          <span className="text-sm text-gray-400">
-                            Expertise: {skill.level}%
-                          </span>
                         </div>
-                      ))}
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No teaching skills added yet</p>
+                        <p className="text-sm">
+                          Add skills you can teach to start exchanging!
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -300,33 +318,51 @@ export default function Profile() {
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <Heart className="w-5 h-5 text-red-400" />
-                      Learning Skills
+                      Skills I Want to Learn ({user.skillsWanted.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {skills
-                      .filter((skill) => skill.category === "Learning")
-                      .map((skill, index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-white font-medium">
-                              {skill.name}
-                            </span>
-                            <Badge
-                              variant="secondary"
-                              className="bg-blue-900/50 text-blue-300"
-                            >
-                              {skill.sessions} sessions
-                            </Badge>
+                    {user.skillsWanted.length > 0 ? (
+                      user.skillsWanted.map((skill, index) => (
+                        <div
+                          key={index}
+                          className="space-y-2 p-3 bg-gray-700/50 rounded-lg"
+                        >
+                          <div className="flex-1">
+                            <h4 className="text-white font-medium">
+                              {skill.skill}
+                            </h4>
+                            {skill.description && (
+                              <p className="text-gray-300 text-sm mt-1">
+                                {skill.description}
+                              </p>
+                            )}
                           </div>
-                          <Progress value={skill.level} className="h-2" />
-                          <span className="text-sm text-gray-400">
-                            Progress: {skill.level}%
-                          </span>
                         </div>
-                      ))}
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No learning interests added yet</p>
+                        <p className="text-sm">Add skills you want to learn!</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
+              </div>
+
+              {/* Add Skills Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <StarBorder color="#10b981" speed="5s">
+                  <Button className="w-full bg-transparent border-none p-0 h-auto font-medium">
+                    Add Teaching Skill
+                  </Button>
+                </StarBorder>
+                <StarBorder color="#f59e0b" speed="5s">
+                  <Button className="w-full bg-transparent border-none p-0 h-auto font-medium">
+                    Add Learning Interest
+                  </Button>
+                </StarBorder>
               </div>
             </TabsContent>
 
