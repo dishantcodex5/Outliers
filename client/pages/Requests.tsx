@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import StarBorder from "@/components/ui/StarBorder";
-import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageSquare,
