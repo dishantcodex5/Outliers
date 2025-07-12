@@ -459,11 +459,16 @@ router.get("/:id", async (req, res: Response) => {
 });
 
 // Search users by skills
-router.get("/", async (req, res: Response) => {
+router.get("/", async (req: any, res: Response) => {
   try {
     const { skill, location, page = 1, limit = 20 } = req.query;
 
     const query: any = { isPublic: true, profileCompleted: true };
+
+    // Exclude current user if authenticated
+    if (req.user && req.user.id) {
+      query._id = { $ne: req.user.id };
+    }
 
     if (skill) {
       query["skillsOffered.skill"] = {
