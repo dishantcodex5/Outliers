@@ -50,7 +50,7 @@ interface ProfileStats {
 }
 
 interface Activity {
-  type: "completed" | "upcoming" | "request";
+  type: 'completed' | 'upcoming' | 'request';
   title: string;
   date: string;
   id?: string;
@@ -79,16 +79,14 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch profile data from API
+    // Fetch profile data from API
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!user) return;
 
       try {
         setIsLoading(true);
-        const authData = JSON.parse(
-          localStorage.getItem("skillswap_auth") || "{}",
-        );
+        const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
         const token = authData.token;
 
         if (!token) {
@@ -116,11 +114,8 @@ export default function Profile() {
           // Set stats
           setStats({
             rating: 4.5 + Math.random() * 0.5, // Mock rating for now
-            completedExchanges:
-              requests.incoming.filter((r: any) => r.status === "accepted")
-                .length +
-              requests.outgoing.filter((r: any) => r.status === "accepted")
-                .length,
+            completedExchanges: requests.incoming.filter((r: any) => r.status === 'accepted').length +
+                                requests.outgoing.filter((r: any) => r.status === 'accepted').length,
             profileCompleteness: completeness,
             requestsReceived: requests.incoming.length,
             requestsSent: requests.outgoing.length,
@@ -130,16 +125,16 @@ export default function Profile() {
           const activity: Activity[] = [];
           requests.incoming.slice(0, 2).forEach((req: any) => {
             activity.push({
-              type: req.status === "accepted" ? "completed" : "request",
-              title: `${req.status === "accepted" ? "Completed" : "Received"} exchange request from ${req.from.name}`,
+              type: req.status === 'accepted' ? 'completed' : 'request',
+              title: `${req.status === 'accepted' ? 'Completed' : 'Received'} exchange request from ${req.from.name}`,
               date: new Date(req.createdAt).toLocaleDateString(),
               id: req._id,
             });
           });
           requests.outgoing.slice(0, 1).forEach((req: any) => {
             activity.push({
-              type: req.status === "accepted" ? "completed" : "request",
-              title: `${req.status === "accepted" ? "Completed" : "Sent"} exchange request to ${req.to.name}`,
+              type: req.status === 'accepted' ? 'completed' : 'request',
+              title: `${req.status === 'accepted' ? 'Completed' : 'Sent'} exchange request to ${req.to.name}`,
               date: new Date(req.createdAt).toLocaleDateString(),
               id: req._id,
             });
@@ -176,6 +171,7 @@ export default function Profile() {
           },
         ];
         setAchievements(userAchievements);
+
       } catch (err: any) {
         setError(err.message || "Failed to load profile data");
         console.error("Failed to fetch profile data:", err);
@@ -195,15 +191,13 @@ export default function Profile() {
     console.log("Sending message:", content);
   };
 
-  const handleAddTeachingSkill = async (skill: {
+    const handleAddTeachingSkill = async (skill: {
     skill: string;
     description: string;
     isApproved?: boolean;
   }) => {
     try {
-      const authData = JSON.parse(
-        localStorage.getItem("skillswap_auth") || "{}",
-      );
+      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
       const token = authData.token;
 
       const response = await fetch("/api/users/skills/offered", {
@@ -236,9 +230,7 @@ export default function Profile() {
     description: string;
   }) => {
     try {
-      const authData = JSON.parse(
-        localStorage.getItem("skillswap_auth") || "{}",
-      );
+      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
       const token = authData.token;
 
       const response = await fetch("/api/users/skills/wanted", {
@@ -290,7 +282,7 @@ export default function Profile() {
             <h1 className="text-3xl font-bold text-white mb-2">
               Profile Dashboard
             </h1>
-            <p className="text-gray-300">
+                        <p className="text-gray-300">
               Manage your skills, track your progress, and connect with the
               community
             </p>
@@ -329,7 +321,7 @@ export default function Profile() {
                     </h2>
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                      <span className="text-white font-semibold">
+                                            <span className="text-white font-semibold">
                         {stats.rating.toFixed(1)}
                       </span>
                       <span className="text-gray-400">
@@ -416,11 +408,14 @@ export default function Profile() {
                   <span className="text-white font-medium">
                     Profile Completeness
                   </span>
-                  <span className="text-primary font-semibold">
+                                    <span className="text-primary font-semibold">
                     {stats.profileCompleteness}%
                   </span>
                 </div>
-                <Progress value={stats.profileCompleteness} className="h-2" />
+                <Progress
+                  value={stats.profileCompleteness}
+                  className="h-2"
+                />
                 <p className="text-sm text-gray-400 mt-2">
                   {user.skillsOffered.length === 0 &&
                     "Add skills you can teach. "}
@@ -484,17 +479,24 @@ export default function Profile() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Overview Tab */}
+                        {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">
-                      {mockStats.completedExchanges}
-                    </div>
-                    <p className="text-gray-400">Total Exchanges</p>
-                  </CardContent>
-                </Card>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">Loading profile data...</span>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-primary mb-2">
+                          {stats.completedExchanges}
+                        </div>
+                        <p className="text-gray-400">Total Exchanges</p>
+                      </CardContent>
+                    </Card>
 
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardContent className="p-6 text-center">
