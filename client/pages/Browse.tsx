@@ -462,27 +462,52 @@ export default function Browse() {
 
             {/* Error Display */}
             {error && (
-              <div className="mb-8 bg-red-900/50 border border-red-700 rounded-lg p-4">
+              <div
+                className={`mb-8 rounded-lg p-4 ${
+                  isOffline
+                    ? "bg-yellow-900/50 border border-yellow-700"
+                    : "bg-red-900/50 border border-red-700"
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-3">
-                  <AlertCircle className="w-5 h-5 text-red-400" />
-                  <span className="text-red-300 font-medium">
-                    Error Loading Users
+                  <AlertCircle
+                    className={`w-5 h-5 ${
+                      isOffline ? "text-yellow-400" : "text-red-400"
+                    }`}
+                  />
+                  <span
+                    className={`font-medium ${
+                      isOffline ? "text-yellow-300" : "text-red-300"
+                    }`}
+                  >
+                    {isOffline ? "Offline Mode" : "Error Loading Users"}
                   </span>
                 </div>
-                <p className="text-red-200 text-sm mb-3">{error}</p>
+                <p
+                  className={`text-sm mb-3 ${
+                    isOffline ? "text-yellow-200" : "text-red-200"
+                  }`}
+                >
+                  {error}
+                </p>
                 <Button
                   onClick={() => {
                     setError(null);
                     setRetryCount(0);
+                    setIsOffline(false);
                     setIsLoading(true);
                     // Trigger refetch by updating a dependency
                     setSearchTerm((prev) => prev);
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-red-600 text-red-300 hover:bg-red-800 hover:text-white"
+                  className={
+                    isOffline
+                      ? "border-yellow-600 text-yellow-300 hover:bg-yellow-800 hover:text-white"
+                      : "border-red-600 text-red-300 hover:bg-red-800 hover:text-white"
+                  }
                 >
-                  Try Again
+                  {isOffline ? "Try Online" : "Try Again"}
                 </Button>
               </div>
             )}
