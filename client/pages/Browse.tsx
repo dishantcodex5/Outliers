@@ -111,28 +111,27 @@ export default function Browse() {
     return () => clearTimeout(debounceTimer);
   }, [searchTerm, locationFilter]);
 
-  // Filter users based on search criteria
+  // Filter users based on availability (client-side filtering for UX)
   const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      user.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.skillsOffered?.some((skill) =>
-        skill.toLowerCase().includes(searchTerm.toLowerCase()),
-      ) ||
-      user.skillsWanted?.some((skill) =>
-        skill.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
+    if (!availabilityFilter) return true;
 
-    const matchesLocation =
-      locationFilter === "" ||
-      user.location?.toLowerCase().includes(locationFilter.toLowerCase());
-
-    const matchesAvailability =
-      availabilityFilter === "" || user.availability === availabilityFilter;
-
-    return matchesSearch && matchesLocation && matchesAvailability;
+    const availability = user.availability;
+    switch (availabilityFilter) {
+      case "Weekdays":
+        return availability.weekdays;
+      case "Weekends":
+        return availability.weekends;
+      case "Evenings":
+        return availability.evenings;
+      case "Flexible":
+        return availability.weekdays && availability.weekends;
+      default:
+        return true;
+    }
   });
+
+  // Convert users to ChromaGrid format
+  const chromaItems = filteredUsers.map(convertUserToChromaItem);
 
   return (
     <Layout>
