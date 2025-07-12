@@ -102,11 +102,11 @@ export default function Profile() {
     const times = [];
     const days = [];
 
-    if (user.availability.weekdays) days.push("Weekdays");
-    if (user.availability.weekends) days.push("Weekends");
-    if (user.availability.mornings) times.push("Mornings");
-    if (user.availability.afternoons) times.push("Afternoons");
-    if (user.availability.evenings) times.push("Evenings");
+    if (localUser.availability.weekdays) days.push("Weekdays");
+    if (localUser.availability.weekends) days.push("Weekends");
+    if (localUser.availability.mornings) times.push("Mornings");
+    if (localUser.availability.afternoons) times.push("Afternoons");
+    if (localUser.availability.evenings) times.push("Evenings");
 
     const dayText = days.length > 0 ? days.join(", ") : "No days set";
     const timeText = times.length > 0 ? times.join(", ") : "No times set";
