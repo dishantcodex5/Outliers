@@ -187,31 +187,57 @@ export default function Admin() {
         const [statsRes, usersRes, activityRes] =
           await Promise.all(corePromises);
 
-        // Check if we got HTML responses (indicating API routing issues)
-        const statsText = await statsRes.text();
-        const usersText = await usersRes.text();
-        const activityText = await activityRes.text();
+        // Process each response individually with better error handling
+        let statsData, usersData, activityData;
 
-        if (
-          statsText.startsWith("<!DOCTYPE") ||
-          usersText.startsWith("<!DOCTYPE") ||
-          activityText.startsWith("<!DOCTYPE")
-        ) {
-          throw new Error(
-            "Admin API endpoints not found. Please check server configuration.",
-          );
+        // Handle stats response
+        try {
+          const statsText = await statsRes.text();
+          if (statsText.startsWith("<!DOCTYPE")) {
+            throw new Error("Admin stats API endpoint not found");
+          }
+          if (!statsRes.ok) {
+            throw new Error(`Stats API failed: ${statsRes.status}`);
+          }
+          statsData = JSON.parse(statsText);
+        } catch (err) {
+          console.warn("Failed to fetch stats, using fallback:", err);
+          statsData = {
+            users: { total: 0, active: 0, newThisMonth: 0 },
+            requests: { total: 0, pending: 0, accepted: 0, successRate: 0 },
+            conversations: { total: 0 },
+          };
         }
 
-        if (!statsRes.ok || !usersRes.ok || !activityRes.ok) {
-          throw new Error(
-            `Failed to fetch admin data: ${statsRes.status}, ${usersRes.status}, ${activityRes.status}`,
-          );
+        // Handle users response
+        try {
+          const usersText = await usersRes.text();
+          if (usersText.startsWith("<!DOCTYPE")) {
+            throw new Error("Admin users API endpoint not found");
+          }
+          if (!usersRes.ok) {
+            throw new Error(`Users API failed: ${usersRes.status}`);
+          }
+          usersData = JSON.parse(usersText);
+        } catch (err) {
+          console.warn("Failed to fetch users, using fallback:", err);
+          usersData = { users: [], pagination: { pages: 1 } };
         }
 
-        // Parse core data
-        const statsData = JSON.parse(statsText);
-        const usersData = JSON.parse(usersText);
-        const activityData = JSON.parse(activityText);
+        // Handle activity response
+        try {
+          const activityText = await activityRes.text();
+          if (activityText.startsWith("<!DOCTYPE")) {
+            throw new Error("Admin activity API endpoint not found");
+          }
+          if (!activityRes.ok) {
+            throw new Error(`Activity API failed: ${activityRes.status}`);
+          }
+          activityData = JSON.parse(activityText);
+        } catch (err) {
+          console.warn("Failed to fetch activity, using fallback:", err);
+          activityData = { activity: [] };
+        }
 
         setStats(statsData);
         setUsers(usersData.users || []);
@@ -251,8 +277,16 @@ export default function Admin() {
           setSwapRequests([]);
         }
       } catch (err: any) {
-        setError(err.message || "Failed to load admin data");
         console.error("Failed to fetch admin data:", err);
+        // Set fallback data instead of showing error
+        setStats({
+          users: { total: 0, active: 0, newThisMonth: 0 },
+          requests: { total: 0, pending: 0, accepted: 0, successRate: 0 },
+          conversations: { total: 0 },
+        });
+        setUsers([]);
+        setActivity([]);
+        setError("Some admin data could not be loaded. Using fallback data.");
       } finally {
         setIsLoading(false);
       }
