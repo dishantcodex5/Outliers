@@ -298,12 +298,12 @@ export default function Profile() {
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-green-400" />
-                      Skills I Teach ({user.skillsOffered.length})
+                      Skills I Teach ({localUser.skillsOffered.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {user.skillsOffered.length > 0 ? (
-                      user.skillsOffered.map((skill, index) => (
+                    {localUser.skillsOffered.length > 0 ? (
+                      localUser.skillsOffered.map((skill, index) => (
                         <div
                           key={index}
                           className="space-y-2 p-3 bg-gray-700/50 rounded-lg"
