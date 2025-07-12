@@ -36,8 +36,11 @@ router.get(
   requireAdmin,
   async (req: any, res: Response) => {
     try {
+      // Check database availability
+      const dbAvailable = await isDatabaseAvailable();
+
       // Development mode without database - return mock stats
-      if (req.noDatabaseConnection) {
+      if (!dbAvailable || req.noDatabaseConnection) {
         return res.json({
           users: {
             total: 125,
