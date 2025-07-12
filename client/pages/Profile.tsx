@@ -383,12 +383,12 @@ export default function Profile() {
 
               {/* Add Skills Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <StarBorder color="#10b981" speed="5s">
+                <StarBorder as="div" color="#10b981" speed="5s">
                   <Button className="w-full bg-transparent border-none p-0 h-auto font-medium">
                     Add Teaching Skill
                   </Button>
                 </StarBorder>
-                <StarBorder color="#f59e0b" speed="5s">
+                <StarBorder as="div" color="#f59e0b" speed="5s">
                   <Button className="w-full bg-transparent border-none p-0 h-auto font-medium">
                     Add Learning Interest
                   </Button>
