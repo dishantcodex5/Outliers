@@ -112,21 +112,41 @@ export default function Browse() {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        const response = await fetch(`/api/users?${params.toString()}`, {
-          headers,
-        });
-
-        // Check for HTML responses (API routing issues)
-        const responseText = await response.text();
-        if (responseText.startsWith("<!DOCTYPE")) {
+        let response;
+        try {
+          response = await fetch(`/api/users?${params.toString()}`, {
+            headers,
+            signal: AbortSignal.timeout(10000), // 10 second timeout
+          });
+        } catch (fetchError: any) {
+          if (fetchError.name === "AbortError") {
+            throw new Error("Request timed out. Please check your connection.");
+          }
           throw new Error(
-            "Users API endpoint not found. Please check server configuration.",
+            "Network error. Please check your internet connection.",
           );
         }
 
+        // Check response status before reading body
         if (!response.ok) {
+          const errorText = await response.text();
+          if (errorText.startsWith("<!DOCTYPE")) {
+            throw new Error(
+              "Users API endpoint not found. Please check server configuration.",
+            );
+          }
           throw new Error(
             `Failed to fetch users: ${response.status} ${response.statusText}`,
+          );
+        }
+
+        // Read response body only once
+        const responseText = await response.text();
+
+        // Check for HTML responses when request succeeded
+        if (responseText.startsWith("<!DOCTYPE")) {
+          throw new Error(
+            "Users API endpoint not found. Please check server configuration.",
           );
         }
 
@@ -139,6 +159,7 @@ export default function Browse() {
 
         setUsers(data.users || []);
         setError(null); // Clear any previous errors
+        setRetryCount(0); // Reset retry count on success
       } catch (err: any) {
         const errorMessage = err.message || "Failed to load users";
         setError(errorMessage);
