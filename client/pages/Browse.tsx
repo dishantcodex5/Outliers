@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/select";
 import ChromaGrid, { ChromaItem } from "@/components/ChromaGrid";
 import Layout from "@/components/Layout";
-import { Search, Filter, Grid3X3, List, Users } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Users,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 // Enhanced user data adapted for ChromaGrid
 const users: ChromaItem[] = [
