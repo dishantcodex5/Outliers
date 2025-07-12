@@ -61,6 +61,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/conversations"
+        element={
+          <ProtectedRoute>
+            <Conversations />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin" element={<Admin />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
