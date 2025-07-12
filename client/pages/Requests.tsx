@@ -236,6 +236,12 @@ export default function Requests() {
             <p className="text-gray-300">
               Manage your skill exchange requests and active sessions
             </p>
+            {error && (
+              <div className="mt-4 bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <span className="text-red-300 text-sm">{error}</span>
+              </div>
+            )}
           </div>
 
           {/* Quick Stats */}
