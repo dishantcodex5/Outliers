@@ -188,9 +188,12 @@ router.post(
       });
     } catch (error) {
       console.error("Create request error:", error);
+      console.error("Request body:", req.body);
+      console.error("User ID:", req.user?.id);
       res.status(500).json({
         error: "Failed to create request",
         message: "Internal server error",
+        details: error.message,
       });
     }
   },
