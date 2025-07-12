@@ -132,16 +132,71 @@ const mockRequests = {
 };
 
 export default function Requests() {
+  const { user } = useAuth();
   const [requests, setRequests] = useState(mockRequests);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
+  const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
+  const [acceptMessage, setAcceptMessage] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleAcceptRequest = (requestId: string) => {
-    // Mock accept logic
-    console.log("Accepting request:", requestId);
+  const handleAcceptRequest = async (requestId: string) => {
+    setIsProcessing(true);
+    try {
+      // Update request status
+      setRequests((prev) => ({
+        ...prev,
+        incoming: prev.incoming.map((req) =>
+          req.id === requestId ? { ...req, status: "accepted" } : req,
+        ),
+      }));
+
+      // Close dialog
+      setShowAcceptDialog(null);
+      setAcceptMessage("");
+
+      // Show success notification (would be a toast in real app)
+      console.log("Request accepted successfully");
+    } catch (error) {
+      console.error("Failed to accept request:", error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleRejectRequest = (requestId: string) => {
-    // Mock reject logic
-    console.log("Rejecting request:", requestId);
+  const handleRejectRequest = async (requestId: string) => {
+    setIsProcessing(true);
+    try {
+      // Update request status
+      setRequests((prev) => ({
+        ...prev,
+        incoming: prev.incoming.map((req) =>
+          req.id === requestId ? { ...req, status: "rejected" } : req,
+        ),
+      }));
+
+      // Close dialog
+      setShowRejectDialog(null);
+      setRejectReason("");
+
+      // Show success notification
+      console.log("Request rejected successfully");
+    } catch (error) {
+      console.error("Failed to reject request:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSendMessage = (content: string) => {
+    // Mock sending message
+    console.log("Sending message:", content);
+  };
+
+  const handleScheduleSession = () => {
+    // Mock scheduling session
+    console.log("Scheduling session");
   };
 
   const getStatusColor = (status: string) => {
