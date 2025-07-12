@@ -29,20 +29,14 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
   // Health check
-  app.get("/api/health", (_req, res) => {
-    res.json({
-      status: "ok",
-      message: "SkillSwap API is running",
-      timestamp: new Date().toISOString(),
-    });
-  });
+  app.get("/api/health", checkDatabaseConnection);
 
-  // API Routes
-  app.use("/api/auth", authRoutes);
-  app.use("/api/users", userRoutes);
-  app.use("/api/requests", requestRoutes);
-  app.use("/api/conversations", conversationRoutes);
-  app.use("/api/skills", skillRoutes);
+  // API Routes with database check
+  app.use("/api/auth", checkDatabaseConnection, authRoutes);
+  app.use("/api/users", checkDatabaseConnection, userRoutes);
+  app.use("/api/requests", checkDatabaseConnection, requestRoutes);
+  app.use("/api/conversations", checkDatabaseConnection, conversationRoutes);
+  app.use("/api/skills", checkDatabaseConnection, skillRoutes);
 
   // Legacy routes
   app.get("/api/ping", (_req, res) => {
