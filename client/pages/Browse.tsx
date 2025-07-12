@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import StarBorder from "@/components/ui/StarBorder";
 import Layout from "@/components/Layout";
 import {
   Search,
@@ -144,14 +145,14 @@ export default function Browse() {
 
   return (
     <Layout>
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-gray-900 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-white mb-2">
               Browse Skills
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-300">
               Discover talented individuals ready to share their expertise
             </p>
           </div>
@@ -166,7 +167,7 @@ export default function Browse() {
                   placeholder="Search by name, skills offered, or skills wanted..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-primary"
                 />
               </div>
 
@@ -176,6 +177,11 @@ export default function Browse() {
                   variant={viewMode === "grid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
+                  className={
+                    viewMode === "grid"
+                      ? ""
+                      : "border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"
+                  }
                 >
                   <Grid3X3 className="w-4 h-4" />
                 </Button>
@@ -183,6 +189,11 @@ export default function Browse() {
                   variant={viewMode === "list" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("list")}
+                  className={
+                    viewMode === "list"
+                      ? ""
+                      : "border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"
+                  }
                 >
                   <List className="w-4 h-4" />
                 </Button>
@@ -190,6 +201,7 @@ export default function Browse() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
+                  className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"
                 >
                   <Filter className="w-4 h-4 mr-2" />
                   Filters
@@ -199,29 +211,30 @@ export default function Browse() {
 
             {/* Filters */}
             {showFilters && (
-              <div className="bg-white p-4 rounded-lg border grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-gray-800 border border-gray-600 p-4 rounded-lg grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Location
                   </label>
                   <Input
                     placeholder="Enter location..."
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Availability
                   </label>
                   <Select
                     value={availabilityFilter}
                     onValueChange={setAvailabilityFilter}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                       <SelectValue placeholder="Select availability" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-700 border-gray-600">
                       <SelectItem value="">All</SelectItem>
                       <SelectItem value="Weekends">Weekends</SelectItem>
                       <SelectItem value="Evenings">Evenings</SelectItem>
@@ -238,6 +251,7 @@ export default function Browse() {
                       setLocationFilter("");
                       setAvailabilityFilter("");
                     }}
+                    className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"
                   >
                     Clear Filters
                   </Button>
@@ -248,7 +262,7 @@ export default function Browse() {
 
           {/* Results Count */}
           <div className="mb-6">
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Showing {filteredUsers.length} of {users.length} users
             </p>
           </div>
@@ -264,7 +278,7 @@ export default function Browse() {
             {filteredUsers.map((user) => (
               <Card
                 key={user.id}
-                className={`hover:shadow-lg transition-shadow ${
+                className={`hover:shadow-xl transition-all duration-300 bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-primary/50 ${
                   viewMode === "list" ? "p-4" : ""
                 }`}
               >
@@ -286,7 +300,7 @@ export default function Browse() {
                         }
                       >
                         <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="bg-primary text-white font-semibold">
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-skill-600 text-white font-semibold">
                           {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
@@ -296,7 +310,7 @@ export default function Browse() {
                             viewMode === "list"
                               ? "bottom-1 right-1"
                               : "bottom-3 right-4"
-                          } w-3 h-3 bg-green-500 rounded-full border-2 border-white`}
+                          } w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800`}
                         ></div>
                       )}
                     </div>
@@ -304,14 +318,14 @@ export default function Browse() {
                     <div className={viewMode === "list" ? "flex-1" : ""}>
                       {/* User Info */}
                       <div className={viewMode === "list" ? "mb-2" : "mb-4"}>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-white">
                           {user.name}
                         </h3>
-                        <div className="flex items-center justify-center sm:justify-start text-gray-500 text-sm mt-1">
+                        <div className="flex items-center justify-center sm:justify-start text-gray-400 text-sm mt-1">
                           <MapPin className="w-4 h-4 mr-1" />
                           {user.location}
                         </div>
-                        <div className="flex items-center justify-center sm:justify-start text-gray-500 text-sm mt-1">
+                        <div className="flex items-center justify-center sm:justify-start text-gray-400 text-sm mt-1">
                           <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
                           {user.rating} ({user.reviews} reviews)
                         </div>
@@ -319,7 +333,7 @@ export default function Browse() {
 
                       {/* Skills Offered */}
                       <div className="mb-3">
-                        <p className="text-sm font-medium text-gray-700 mb-2">
+                        <p className="text-sm font-medium text-gray-300 mb-2">
                           Offers:
                         </p>
                         <div className="flex flex-wrap gap-1 justify-center sm:justify-start">
@@ -327,7 +341,7 @@ export default function Browse() {
                             <Badge
                               key={skill}
                               variant="default"
-                              className="text-xs"
+                              className="text-xs bg-primary hover:bg-primary/80"
                             >
                               {skill}
                             </Badge>
@@ -337,7 +351,7 @@ export default function Browse() {
 
                       {/* Skills Wanted */}
                       <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">
+                        <p className="text-sm font-medium text-gray-300 mb-2">
                           Wants:
                         </p>
                         <div className="flex flex-wrap gap-1 justify-center sm:justify-start">
@@ -345,7 +359,7 @@ export default function Browse() {
                             <Badge
                               key={skill}
                               variant="outline"
-                              className="text-xs"
+                              className="text-xs border-gray-500 text-gray-300 hover:border-primary hover:text-primary"
                             >
                               {skill}
                             </Badge>
@@ -355,7 +369,7 @@ export default function Browse() {
 
                       {/* Availability */}
                       <div className="mb-4">
-                        <div className="flex items-center justify-center sm:justify-start text-gray-500 text-sm">
+                        <div className="flex items-center justify-center sm:justify-start text-gray-400 text-sm">
                           <Clock className="w-4 h-4 mr-1" />
                           Available {user.availability}
                         </div>
@@ -364,10 +378,14 @@ export default function Browse() {
 
                     {/* Action Button */}
                     <div className={viewMode === "list" ? "ml-4" : ""}>
-                      <Button className="w-full sm:w-auto">
-                        <MessageSquare className="w-4 h-4 mr-2" />
+                      <StarBorder
+                        className="text-sm px-4 py-2"
+                        color="#a855f7"
+                        speed="5s"
+                      >
+                        <MessageSquare className="w-4 h-4 mr-2 inline" />
                         Connect
-                      </Button>
+                      </StarBorder>
                     </div>
                   </div>
                 </CardContent>
@@ -378,11 +396,11 @@ export default function Browse() {
           {/* No Results */}
           {filteredUsers.length === 0 && (
             <div className="text-center py-12">
-              <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <Search className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">
                 No users found
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Try adjusting your search criteria or filters
               </p>
             </div>
