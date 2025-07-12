@@ -69,8 +69,8 @@ const convertUserToChromaItem = (
     borderColor: "#4F46E5",
     gradient: "linear-gradient(145deg, #4F46E5, #1e293b)",
     url: `/users/${user._id}`,
-    rating: 4.5 + Math.random() * 0.5, // Mock rating for now
-    reviews: Math.floor(Math.random() * 50) + 5,
+    rating: parseFloat((4.5 + Math.random() * 0.5).toFixed(2)), // Mock rating for now
+    reviews: parseFloat((Math.random() * 50 + 5).toFixed(2)),
     isOnline: Math.random() > 0.5,
     skillsOffered: user.skillsOffered.map((s) => s.skill),
     skillsWanted: user.skillsWanted.map((s) => s.skill),
