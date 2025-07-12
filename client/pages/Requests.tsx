@@ -77,6 +77,46 @@ export default function Requests() {
   const [rejectReason, setRejectReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Fetch requests from API
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        const response = await fetch("/api/requests", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch requests");
+        }
+
+        const data = await response.json();
+        setRequests(data.requests);
+      } catch (err: any) {
+        setError(err.message || "Failed to load requests");
+        console.error("Failed to fetch requests:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, [user]);
+
   const handleAcceptRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
