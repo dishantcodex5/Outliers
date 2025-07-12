@@ -107,8 +107,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedAuth = localStorage.getItem("skillswap_auth");
     if (savedAuth) {
-      const authData = JSON.parse(savedAuth);
-      setUser(authData.user);
+      try {
+        const authData = JSON.parse(savedAuth);
+        if (authData.user && authData.token) {
+          setUser(authData.user);
+        } else {
+          // Invalid auth data, remove it
+          localStorage.removeItem("skillswap_auth");
+        }
+      } catch (error) {
+        // Invalid JSON, remove it
+        localStorage.removeItem("skillswap_auth");
+      }
     }
   }, []);
 
