@@ -22,8 +22,28 @@ router.get(
   "/stats",
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: any, res: Response) => {
     try {
+      // Development mode without database - return mock stats
+      if (req.noDatabaseConnection) {
+        return res.json({
+          users: {
+            total: 125,
+            active: 89,
+            newThisMonth: 12,
+          },
+          requests: {
+            total: 45,
+            pending: 8,
+            accepted: 32,
+            successRate: 71.1,
+          },
+          conversations: {
+            total: 67,
+          },
+        });
+      }
+
       // Get user stats
       const totalUsers = await User.countDocuments();
       const activeUsers = await User.countDocuments({ profileCompleted: true });
