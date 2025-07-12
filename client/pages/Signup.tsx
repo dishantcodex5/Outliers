@@ -1,31 +1,57 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import StarBorder from "@/components/ui/StarBorder";
-import { Users, Mail, Lock, User, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Users, Mail, Lock, User, AlertCircle } from "lucide-react";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+    setIsLoading(true);
+    setError("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await signup({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/profile");
+    } catch (err: any) {
+      setError(err.message || "Signup failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
