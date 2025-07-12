@@ -315,8 +315,13 @@ export default function Admin() {
         },
       });
 
+      const responseText = await response.text();
+      if (responseText.startsWith("<!DOCTYPE")) {
+        throw new Error(`Admin skills API endpoint not found`);
+      }
+
       if (!response.ok) {
-        throw new Error(`Failed to ${action} skill`);
+        throw new Error(`Failed to ${action} skill: ${response.status}`);
       }
 
       // Remove from pending list
