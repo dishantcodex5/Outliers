@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React from "react";
+
+const { createContext, useContext, useState, useEffect } = React;
 
 interface User {
   id: string;
