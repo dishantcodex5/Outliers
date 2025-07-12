@@ -223,18 +223,32 @@ export default function Browse() {
         }
 
         let response;
+        let controller: AbortController | undefined;
+
         try {
+          // Create timeout controller for better browser compatibility
+          controller = new AbortController();
+          const timeoutId = setTimeout(() => controller?.abort(), 10000); // 10 second timeout
+
           response = await fetch(`/api/users?${params.toString()}`, {
             headers,
-            signal: AbortSignal.timeout(10000), // 10 second timeout
+            signal: controller.signal,
           });
+
+          clearTimeout(timeoutId);
         } catch (fetchError: any) {
           if (fetchError.name === "AbortError") {
             throw new Error("Request timed out. Please check your connection.");
           }
-          throw new Error(
-            "Network error. Please check your internet connection.",
-          );
+          if (
+            fetchError.name === "TypeError" &&
+            fetchError.message === "Failed to fetch"
+          ) {
+            throw new Error(
+              "Network error. Please check your internet connection.",
+            );
+          }
+          throw new Error(`Connection error: ${fetchError.message}`);
         }
 
         // Check response status before reading body
