@@ -85,6 +85,27 @@
   transition: all 0.1s ease;
 }
 
+.star-border-container:focus-within .inner-content {
+  outline: 2px solid rgba(168, 85, 247, 0.5);
+  outline-offset: 2px;
+}
+
+.star-border-container[data-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.star-border-container[data-disabled="true"] .inner-content {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+}
+
+.star-border-container[data-disabled="true"]:hover .inner-content {
+  transform: none;
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 @keyframes star-movement-bottom {
   0% {
     transform: translate(0%, 0%);
