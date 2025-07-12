@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import ChromaGrid, { ChromaItem } from "@/components/ChromaGrid";
 import Layout from "@/components/Layout";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Search,
   Filter,
@@ -80,6 +81,7 @@ const convertUserToChromaItem = (
 
 export default function Browse() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("");
@@ -98,7 +100,20 @@ export default function Browse() {
         if (searchTerm) params.append("skill", searchTerm);
         if (locationFilter) params.append("location", locationFilter);
 
-        const response = await fetch(`/api/users?${params.toString()}`);
+        // Get auth token if user is logged in
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        const headers: any = {};
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`/api/users?${params.toString()}`, {
+          headers,
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }
