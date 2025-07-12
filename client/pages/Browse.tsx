@@ -317,9 +317,28 @@ export default function Browse() {
 
             {/* Error Display */}
             {error && (
-              <div className="mb-8 bg-red-900/50 border border-red-700 rounded-lg p-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-                <span className="text-red-300">{error}</span>
+              <div className="mb-8 bg-red-900/50 border border-red-700 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                  <span className="text-red-300 font-medium">
+                    Error Loading Users
+                  </span>
+                </div>
+                <p className="text-red-200 text-sm mb-3">{error}</p>
+                <Button
+                  onClick={() => {
+                    setError(null);
+                    setRetryCount(0);
+                    setIsLoading(true);
+                    // Trigger refetch by updating a dependency
+                    setSearchTerm((prev) => prev);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-red-600 text-red-300 hover:bg-red-800 hover:text-white"
+                >
+                  Try Again
+                </Button>
               </div>
             )}
 
