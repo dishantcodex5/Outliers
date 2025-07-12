@@ -33,108 +33,43 @@ import {
   Loader2,
 } from "lucide-react";
 
-// Mock data for swap requests
-const mockRequests = {
-  incoming: [
-    {
-      id: "1",
-      from: {
-        name: "Sarah Chen",
-        avatar: "SC",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-        rating: 4.9,
-      },
-      skill: {
-        offering: "UI/UX Design",
-        wanting: "React Development",
-      },
-      message:
-        "Hi! I'd love to learn React from you. I can teach you UI/UX design principles and Figma workflows in return.",
-      date: "2024-01-15",
-      status: "pending",
-      duration: "2 hours per week",
-    },
-    {
-      id: "2",
-      from: {
-        name: "Mike Johnson",
-        avatar: "MJ",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-        rating: 4.7,
-      },
-      skill: {
-        offering: "Digital Marketing",
-        wanting: "Node.js",
-      },
-      message:
-        "I'm looking to build a backend for my startup. Can we exchange marketing knowledge for Node.js tutorials?",
-      date: "2024-01-14",
-      status: "pending",
-      duration: "1 hour per session",
-    },
-  ],
-  outgoing: [
-    {
-      id: "3",
-      to: {
-        name: "Emma Rodriguez",
-        avatar: "ER",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-        rating: 4.8,
-      },
-      skill: {
-        offering: "React Development",
-        wanting: "Photography",
-      },
-      message:
-        "Hi Emma! I saw your photography portfolio and would love to learn composition and lighting techniques. I can help you with React in return.",
-      date: "2024-01-13",
-      status: "pending",
-      duration: "90 minutes per session",
-    },
-    {
-      id: "4",
-      to: {
-        name: "David Kim",
-        avatar: "DK",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
-        rating: 4.6,
-      },
-      skill: {
-        offering: "JavaScript",
-        wanting: "Korean Language",
-      },
-      message:
-        "안녕하세요! I'd like to learn Korean and can teach JavaScript in exchange.",
-      date: "2024-01-12",
-      status: "accepted",
-      duration: "2 hours per week",
-    },
-  ],
-  scheduled: [
-    {
-      id: "5",
-      partner: {
-        name: "Lisa Wang",
-        avatar: "LW",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
-        rating: 4.9,
-      },
-      skill: {
-        teaching: "Node.js",
-        learning: "Mandarin Chinese",
-      },
-      nextSession: "2024-01-20T15:00:00Z",
-      status: "active",
-      sessionsCompleted: 3,
-      totalSessions: 8,
-    },
-  ],
-};
+interface SwapRequest {
+  _id: string;
+  from: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+  };
+  to: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+  };
+  skillOffered: string;
+  skillWanted: string;
+  message: string;
+  duration: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+}
+
+interface RequestsData {
+  incoming: SwapRequest[];
+  outgoing: SwapRequest[];
+  all: SwapRequest[];
+}
 
 export default function Requests() {
   const { user } = useAuth();
-  const [requests, setRequests] = useState(mockRequests);
+  const [requests, setRequests] = useState<RequestsData>({
+    incoming: [],
+    outgoing: [],
+    all: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
