@@ -528,6 +528,183 @@ export default function Requests() {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Accept Request Dialog */}
+        <Dialog
+          open={!!showAcceptDialog}
+          onOpenChange={() => setShowAcceptDialog(null)}
+        >
+          <DialogContent className="bg-gray-800 border-gray-600 text-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                Accept Skill Exchange Request
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-gray-300">
+                You're about to accept this skill exchange request. You can add
+                a welcome message to start the conversation.
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="accept-message" className="text-gray-200">
+                  Welcome Message (Optional)
+                </Label>
+                <Textarea
+                  id="accept-message"
+                  value={acceptMessage}
+                  onChange={(e) => setAcceptMessage(e.target.value)}
+                  placeholder="Hi! I'm excited to help you learn React. When would be a good time to start?"
+                  className="bg-gray-700 border-gray-600 text-white resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAcceptDialog(null)}
+                  className="flex-1 border-gray-600 text-gray-300"
+                  disabled={isProcessing}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() =>
+                    showAcceptDialog && handleAcceptRequest(showAcceptDialog)
+                  }
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Accepting..." : "Accept Request"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reject Request Dialog */}
+        <Dialog
+          open={!!showRejectDialog}
+          onOpenChange={() => setShowRejectDialog(null)}
+        >
+          <DialogContent className="bg-gray-800 border-gray-600 text-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-400" />
+                Decline Skill Exchange Request
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-gray-300">
+                You're about to decline this skill exchange request. You can
+                optionally provide a reason.
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="reject-reason" className="text-gray-200">
+                  Reason (Optional)
+                </Label>
+                <Textarea
+                  id="reject-reason"
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Sorry, I'm not available for new exchanges at the moment..."
+                  className="bg-gray-700 border-gray-600 text-white resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowRejectDialog(null)}
+                  className="flex-1 border-gray-600 text-gray-300"
+                  disabled={isProcessing}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() =>
+                    showRejectDialog && handleRejectRequest(showRejectDialog)
+                  }
+                  variant="destructive"
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Declining..." : "Decline Request"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Chat Interface */}
+        {selectedChat && user && (
+          <Dialog
+            open={!!selectedChat}
+            onOpenChange={() => setSelectedChat(null)}
+          >
+            <DialogContent className="bg-transparent border-none p-0 max-w-4xl">
+              <ChatInterface
+                currentUser={{
+                  id: user.id,
+                  name: user.name,
+                  avatar: user.avatar,
+                  profilePhoto: user.profilePhoto,
+                  online: true,
+                }}
+                otherUser={{
+                  id: "other-user",
+                  name: "Sarah Chen",
+                  avatar: "SC",
+                  profilePhoto:
+                    "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+                  online: true,
+                  lastSeen: "5 minutes ago",
+                }}
+                messages={[
+                  {
+                    id: "1",
+                    senderId: "other-user",
+                    content:
+                      "Hi! I'd love to learn React from you. I can teach you UI/UX design principles and Figma workflows in return.",
+                    timestamp: new Date(
+                      Date.now() - 2 * 60 * 60 * 1000,
+                    ).toISOString(),
+                    type: "text",
+                    status: "read",
+                  },
+                  {
+                    id: "2",
+                    senderId: user.id,
+                    content:
+                      "Great! I'm excited to help you learn React. When would be a good time to start our first session?",
+                    timestamp: new Date(
+                      Date.now() - 1 * 60 * 60 * 1000,
+                    ).toISOString(),
+                    type: "text",
+                    status: "read",
+                  },
+                  {
+                    id: "3",
+                    senderId: "other-user",
+                    content:
+                      "How about this Saturday at 2 PM? We could start with React fundamentals and I can show you some design patterns afterward.",
+                    timestamp: new Date(
+                      Date.now() - 30 * 60 * 1000,
+                    ).toISOString(),
+                    type: "text",
+                    status: "read",
+                  },
+                ]}
+                onSendMessage={handleSendMessage}
+                onScheduleSession={handleScheduleSession}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </Layout>
   );
