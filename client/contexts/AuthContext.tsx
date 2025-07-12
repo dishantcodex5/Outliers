@@ -169,12 +169,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("skillswap_auth");
   };
 
+  const updateUser = async (userData: Partial<User>) => {
+    if (!user) return;
+
+    // Mock API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const updatedUser = {
+      ...user,
+      ...userData,
+      updatedAt: new Date().toISOString(),
+    };
+    setUser(updatedUser);
+    localStorage.setItem(
+      "skillswap_auth",
+      JSON.stringify({ user: updatedUser }),
+    );
+  };
+
   const value = {
     user,
     isAuthenticated: !!user,
     login,
     logout,
     signup,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
