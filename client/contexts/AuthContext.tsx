@@ -134,12 +134,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: Date.now().toString(),
       name: userData.name,
       email: userData.email,
+      location: "",
+      profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}`,
+      skillsOffered: [],
+      skillsWanted: [],
+      availability: {
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+      },
+      isPublic: true,
+      role: "user",
       avatar: userData.name
         .split(" ")
         .map((n) => n[0])
         .join("")
         .toUpperCase(),
-      profilePicture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     setUser(newUser);
