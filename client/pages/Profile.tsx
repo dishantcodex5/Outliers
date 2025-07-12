@@ -213,15 +213,20 @@ export default function Profile() {
                     Profile Completeness
                   </span>
                   <span className="text-primary font-semibold">
-                    {userData.profileCompleteness}%
+                    {mockStats.profileCompleteness}%
                   </span>
                 </div>
                 <Progress
-                  value={userData.profileCompleteness}
+                  value={mockStats.profileCompleteness}
                   className="h-2"
                 />
                 <p className="text-sm text-gray-400 mt-2">
-                  Complete your profile to get more skill exchange opportunities
+                  {user.skillsOffered.length === 0 &&
+                    "Add skills you can teach. "}
+                  {user.skillsWanted.length === 0 &&
+                    "Add skills you want to learn. "}
+                  {!user.location && "Add your location. "}
+                  Complete your profile to get more opportunities!
                 </p>
               </div>
             </CardContent>
