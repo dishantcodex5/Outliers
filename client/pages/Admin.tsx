@@ -701,24 +701,416 @@ export default function Admin() {
               </Card>
             </TabsContent>
 
-            {/* Reports Tab */}
+            {/* Skills Management Tab */}
+            <TabsContent value="skills" className="space-y-6">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-white">
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Pending Skills Approval
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {skillSubmissions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <BookOpen className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium text-white mb-2">
+                        No Pending Skills
+                      </h3>
+                      <p className="text-gray-400">
+                        All skills have been reviewed.
+                      </p>
+                    </div>
+                  ) : (
+                    skillSubmissions.map((skill) => (
+                      <div
+                        key={skill._id}
+                        className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="text-white font-medium">
+                              {skill.skill}
+                            </h4>
+                            <Badge className="bg-yellow-900/50 text-yellow-300 border-yellow-600">
+                              Pending Review
+                            </Badge>
+                          </div>
+                          <p className="text-gray-300 text-sm mb-2">
+                            {skill.description}
+                          </p>
+                          <p className="text-gray-400 text-xs">
+                            Submitted by: {skill.user.name} ({skill.user.email})
+                          </p>
+                          <p className="text-gray-500 text-xs">
+                            {new Date(skill.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-600 text-green-300 hover:bg-green-700"
+                            onClick={() =>
+                              handleSkillAction(skill._id, "approve")
+                            }
+                            disabled={actionLoading === skill._id}
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-600 text-red-300 hover:bg-red-700"
+                            onClick={() =>
+                              handleSkillAction(skill._id, "reject")
+                            }
+                            disabled={actionLoading === skill._id}
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Swaps Management Tab */}
+            <TabsContent value="swaps" className="space-y-6">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-white">
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    Skill Exchange Monitoring
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {swapRequests.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MessageSquare className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium text-white mb-2">
+                        No Swap Requests
+                      </h3>
+                      <p className="text-gray-400">
+                        No skill exchange requests to monitor.
+                      </p>
+                    </div>
+                  ) : (
+                    swapRequests.map((swap) => (
+                      <div
+                        key={swap._id}
+                        className="p-4 bg-gray-700/50 rounded-lg border border-gray-600"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-white font-medium">
+                              {swap.from.name} → {swap.to.name}
+                            </h4>
+                            <Badge
+                              className={
+                                swap.status === "pending"
+                                  ? "bg-yellow-900/50 text-yellow-300 border-yellow-600"
+                                  : swap.status === "accepted"
+                                    ? "bg-green-900/50 text-green-300 border-green-600"
+                                    : "bg-red-900/50 text-red-300 border-red-600"
+                              }
+                            >
+                              {swap.status.charAt(0).toUpperCase() +
+                                swap.status.slice(1)}
+                            </Badge>
+                          </div>
+                          <span className="text-gray-400 text-sm">
+                            {new Date(swap.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-400">Offering:</p>
+                            <p className="text-white">{swap.offeredSkill}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Requesting:</p>
+                            <p className="text-white">{swap.requestedSkill}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Platform Messages Tab */}
+            <TabsContent value="messages" className="space-y-6">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center text-white">
+                      <Send className="w-5 h-5 mr-2" />
+                      Platform Messages
+                    </CardTitle>
+                    <Button
+                      onClick={() => setShowMessageForm(true)}
+                      className="bg-primary hover:bg-primary/80"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Message
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {showMessageForm ? (
+                    <div className="space-y-4 p-4 bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-medium">
+                          Send Platform Message
+                        </h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowMessageForm(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Title
+                          </label>
+                          <Input
+                            value={messageForm.title}
+                            onChange={(e) =>
+                              setMessageForm({
+                                ...messageForm,
+                                title: e.target.value,
+                              })
+                            }
+                            placeholder="Message title"
+                            className="bg-gray-700 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Type
+                          </label>
+                          <Select
+                            value={messageForm.type}
+                            onValueChange={(value: any) =>
+                              setMessageForm({ ...messageForm, type: value })
+                            }
+                          >
+                            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-700 border-gray-600">
+                              <SelectItem value="announcement">
+                                Announcement
+                              </SelectItem>
+                              <SelectItem value="maintenance">
+                                Maintenance
+                              </SelectItem>
+                              <SelectItem value="feature">
+                                Feature Update
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Priority
+                          </label>
+                          <Select
+                            value={messageForm.priority}
+                            onValueChange={(value: any) =>
+                              setMessageForm({
+                                ...messageForm,
+                                priority: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-700 border-gray-600">
+                              <SelectItem value="low">Low</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="high">High</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Target Users
+                          </label>
+                          <Select
+                            value={messageForm.targetUsers}
+                            onValueChange={(value: any) =>
+                              setMessageForm({
+                                ...messageForm,
+                                targetUsers: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-700 border-gray-600">
+                              <SelectItem value="all">All Users</SelectItem>
+                              <SelectItem value="active">
+                                Active Users
+                              </SelectItem>
+                              <SelectItem value="inactive">
+                                Inactive Users
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Message Content
+                        </label>
+                        <textarea
+                          value={messageForm.content}
+                          onChange={(e) =>
+                            setMessageForm({
+                              ...messageForm,
+                              content: e.target.value,
+                            })
+                          }
+                          placeholder="Enter your message..."
+                          rows={4}
+                          className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowMessageForm(false)}
+                          className="border-gray-600 text-gray-300"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={
+                            !messageForm.title ||
+                            !messageForm.content ||
+                            actionLoading === "message"
+                          }
+                          className="bg-primary hover:bg-primary/80"
+                        >
+                          {actionLoading === "message" ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <Send className="w-4 h-4 mr-2" />
+                          )}
+                          Send Message
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Send className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium text-white mb-2">
+                        Platform Messaging
+                      </h3>
+                      <p className="text-gray-400 mb-4">
+                        Send announcements, feature updates, or maintenance
+                        alerts to users.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Updated Reports Tab */}
             <TabsContent value="reports" className="space-y-6">
               <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                 <CardHeader>
                   <CardTitle className="flex items-center text-white">
-                    <Flag className="w-5 h-5 mr-2" />
-                    Content Reports
+                    <Download className="w-5 h-5 mr-2" />
+                    Download Reports
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <Flag className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-white mb-2">
-                      No Reports
-                    </h3>
-                    <p className="text-gray-400">
-                      No flagged content at this time.
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+                      <FileText className="w-8 h-8 text-blue-400 mb-3" />
+                      <h3 className="text-white font-medium mb-2">
+                        User Activity Report
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">
+                        Complete user activity, registrations, and engagement
+                        metrics.
+                      </p>
+                      <Button
+                        onClick={() => handleDownloadReport("user-activity")}
+                        disabled={actionLoading === "user-activity"}
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                      >
+                        {actionLoading === "user-activity" ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Download className="w-4 h-4 mr-2" />
+                        )}
+                        Download CSV
+                      </Button>
+                    </div>
+
+                    <div className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+                      <FileText className="w-8 h-8 text-green-400 mb-3" />
+                      <h3 className="text-white font-medium mb-2">
+                        Swap Statistics
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">
+                        Skill exchange data, success rates, and completion
+                        metrics.
+                      </p>
+                      <Button
+                        onClick={() => handleDownloadReport("swap-stats")}
+                        disabled={actionLoading === "swap-stats"}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        {actionLoading === "swap-stats" ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Download className="w-4 h-4 mr-2" />
+                        )}
+                        Download CSV
+                      </Button>
+                    </div>
+
+                    <div className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+                      <FileText className="w-8 h-8 text-purple-400 mb-3" />
+                      <h3 className="text-white font-medium mb-2">
+                        Feedback Logs
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">
+                        User feedback, ratings, and platform improvement
+                        suggestions.
+                      </p>
+                      <Button
+                        onClick={() => handleDownloadReport("feedback-logs")}
+                        disabled={actionLoading === "feedback-logs"}
+                        className="w-full bg-purple-600 hover:bg-purple-700"
+                      >
+                        {actionLoading === "feedback-logs" ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Download className="w-4 h-4 mr-2" />
+                        )}
+                        Download CSV
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
