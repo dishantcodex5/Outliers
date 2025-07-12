@@ -484,7 +484,7 @@ export default function UserProfile() {
                               !currentUser?.skillsOffered ||
                               currentUser.skillsOffered.length === 0
                             ) {
-                              setRequestError(
+                              alert(
                                 "You need to add skills to your profile before sending requests",
                               );
                               return;
@@ -493,9 +493,7 @@ export default function UserProfile() {
                               !userData.skillsOffered ||
                               userData.skillsOffered.length === 0
                             ) {
-                              setRequestError(
-                                "This user doesn't offer any skills yet",
-                              );
+                              alert("This user doesn't offer any skills yet");
                               return;
                             }
                             setRequestError(null);
