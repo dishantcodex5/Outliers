@@ -443,56 +443,86 @@ export default function Requests() {
 
             {/* Outgoing Requests */}
             <TabsContent value="outgoing" className="space-y-4">
-              {requests.outgoing.map((request) => (
-                <Card
-                  key={request.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={request.to.profilePicture}
-                          alt={request.to.name}
-                        />
-                        <AvatarFallback className="bg-primary text-white">
-                          {request.to.avatar}
-                        </AvatarFallback>
-                      </Avatar>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">
+                    Loading requests...
+                  </span>
+                </div>
+              ) : requests.outgoing.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Send className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-xl font-medium text-white mb-2">
+                    No outgoing requests
+                  </h3>
+                  <p className="text-gray-400">
+                    You haven't sent any skill exchange requests yet
+                  </p>
+                </div>
+              ) : (
+                requests.outgoing.map((request) => (
+                  <Card
+                    key={request._id}
+                    className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage
+                            src={request.to.profilePhoto}
+                            alt={request.to.name}
+                          />
+                          <AvatarFallback className="bg-primary text-white">
+                            {request.to.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
 
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-white">
-                            {request.to.name}
-                          </h3>
-                          <Badge className={getStatusColor(request.status)}>
-                            {request.status}
-                          </Badge>
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                            <span className="text-green-400">Your Offer:</span>
-                            <span>{request.skill.offering}</span>
-                            <ArrowRight className="w-4 h-4" />
-                            <span className="text-blue-400">You Want:</span>
-                            <span>{request.skill.wanting}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold text-white">
+                              {request.to.name}
+                            </h3>
+                            <Badge className={getStatusColor(request.status)}>
+                              {request.status}
+                            </Badge>
                           </div>
+
+                          <div className="mb-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
+                              <span className="text-green-400">
+                                Your Offer:
+                              </span>
+                              <span>{request.skillOffered}</span>
+                              <ArrowRight className="w-4 h-4" />
+                              <span className="text-blue-400">You Want:</span>
+                              <span>{request.skillWanted}</span>
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Duration: {request.duration}
+                            </div>
+                          </div>
+
+                          <p className="text-gray-300 mb-4">
+                            {request.message}
+                          </p>
+
                           <div className="text-sm text-gray-400">
-                            Duration: {request.duration}
+                            Sent on{" "}
+                            {new Date(request.createdAt).toLocaleDateString()}
                           </div>
-                        </div>
-
-                        <p className="text-gray-300 mb-4">{request.message}</p>
-
-                        <div className="text-sm text-gray-400">
-                          Sent on {new Date(request.date).toLocaleDateString()}
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </TabsContent>
 
             {/* Active Sessions */}
