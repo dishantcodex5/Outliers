@@ -308,7 +308,7 @@ export default function Requests() {
                 value="active"
                 className="data-[state=active]:bg-primary"
               >
-                Active Sessions ({requests.scheduled.length})
+                Active Sessions (0)
               </TabsTrigger>
             </TabsList>
 
