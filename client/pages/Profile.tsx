@@ -462,7 +462,7 @@ export default function Profile() {
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {stats.rating.toFixed(1)}
+                        {stats.rating.toFixed(2)}
                       </span>
                       <span className="text-gray-400">
                         ({stats.completedExchanges} exchanges)
@@ -651,7 +651,7 @@ export default function Profile() {
                     <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                       <CardContent className="p-6 text-center">
                         <div className="text-3xl font-bold text-yellow-400 mb-2">
-                          {stats.rating.toFixed(1)}
+                          {stats.rating.toFixed(2)}
                         </div>
                         <p className="text-gray-400">Average Rating</p>
                       </CardContent>
