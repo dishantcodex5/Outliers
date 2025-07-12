@@ -46,7 +46,7 @@ export default function Signup() {
         email: formData.email,
         password: formData.password,
       });
-      navigate("/profile");
+      navigate("/profile-setup");
     } catch (err: any) {
       setError(err.message || "Signup failed");
     } finally {
