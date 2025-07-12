@@ -120,21 +120,39 @@ export default function Requests() {
   const handleAcceptRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      // Update request status
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/requests/${requestId}/accept`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ welcomeMessage: acceptMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to accept request");
+      }
+
+      const data = await response.json();
+
+      // Update local state
       setRequests((prev) => ({
         ...prev,
         incoming: prev.incoming.map((req) =>
-          req.id === requestId ? { ...req, status: "accepted" } : req,
+          req._id === requestId ? { ...req, status: "accepted" as const } : req,
         ),
       }));
 
-      // Close dialog
       setShowAcceptDialog(null);
       setAcceptMessage("");
-
-      // Show success notification (would be a toast in real app)
       console.log("Request accepted successfully");
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || "Failed to accept request");
       console.error("Failed to accept request:", error);
     } finally {
       setIsProcessing(false);
