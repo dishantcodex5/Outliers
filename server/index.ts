@@ -63,7 +63,7 @@ export function createServer() {
     },
   );
 
-  // Serve static files in production
+  // Production: serve static files and handle SPA routing
   if (process.env.NODE_ENV === "production") {
     const path = require("path");
     app.use(express.static(path.join(__dirname, "../spa")));
@@ -72,15 +72,8 @@ export function createServer() {
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "../spa/index.html"));
     });
-  } else {
-    // In development, only handle non-API routes with 404 for API calls
-    app.use("/api/*", (req, res) => {
-      res.status(404).json({
-        error: "Not found",
-        message: `API route ${req.originalUrl} not found`,
-      });
-    });
   }
+  // Development: Let Vite handle all non-API routes, no catch-all needed
 
   return app;
 }
