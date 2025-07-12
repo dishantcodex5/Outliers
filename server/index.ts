@@ -40,6 +40,7 @@ export function createServer() {
   app.use("/api/users", userRoutes);
   app.use("/api/requests", requestRoutes);
   app.use("/api/conversations", conversationRoutes);
+  app.use("/api/skills", skillRoutes);
 
   // Legacy routes
   app.get("/api/ping", (_req, res) => {
