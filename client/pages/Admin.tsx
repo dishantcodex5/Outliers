@@ -222,36 +222,64 @@ export default function Admin() {
           </div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">1,247</div>
-                <div className="text-gray-400">Total Users</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <MessageSquare className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">2,834</div>
-                <div className="text-gray-400">Active Swaps</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <Flag className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">12</div>
-                <div className="text-gray-400">Flagged Content</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <BarChart3 className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">94.2%</div>
-                <div className="text-gray-400">Success Rate</div>
-              </CardContent>
-            </Card>
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <span className="ml-2 text-gray-300">Loading admin data...</span>
+            </div>
+          ) : stats ? (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">
+                    {stats.users.total}
+                  </div>
+                  <div className="text-gray-400">Total Users</div>
+                  <div className="text-xs text-green-400 mt-1">
+                    +{stats.users.newThisMonth} this month
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <MessageSquare className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">
+                    {stats.requests.accepted}
+                  </div>
+                  <div className="text-gray-400">Active Swaps</div>
+                  <div className="text-xs text-yellow-400 mt-1">
+                    {stats.requests.pending} pending
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <UserCheck className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">
+                    {stats.users.active}
+                  </div>
+                  <div className="text-gray-400">Active Users</div>
+                  <div className="text-xs text-blue-400 mt-1">
+                    {Math.round((stats.users.active / stats.users.total) * 100)}
+                    % completion rate
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 hover:bg-gray-700 transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <TrendingUp className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">
+                    {stats.requests.successRate}%
+                  </div>
+                  <div className="text-gray-400">Success Rate</div>
+                  <div className="text-xs text-green-400 mt-1">
+                    {stats.requests.total} total requests
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : null}
 
           {/* Management Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
