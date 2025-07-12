@@ -137,7 +137,9 @@ export default function Browse() {
   });
 
   // Convert users to ChromaGrid format
-  const chromaItems = filteredUsers.map(convertUserToChromaItem);
+  const chromaItems = filteredUsers.map((user) =>
+    convertUserToChromaItem(user, navigate),
+  );
 
   return (
     <Layout>
