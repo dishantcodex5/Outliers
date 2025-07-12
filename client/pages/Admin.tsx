@@ -255,6 +255,108 @@ export default function Admin() {
     }
   };
 
+  const handleSkillAction = async (
+    skillId: string,
+    action: "approve" | "reject",
+  ) => {
+    try {
+      setActionLoading(skillId);
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/admin/skills/${skillId}/${action}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${action} skill`);
+      }
+
+      // Remove from pending list
+      setSkillSubmissions(
+        skillSubmissions.filter((skill) => skill._id !== skillId),
+      );
+    } catch (err: any) {
+      setError(err.message || `Failed to ${action} skill`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      setActionLoading("message");
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch("/api/admin/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(messageForm),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      setShowMessageForm(false);
+      setMessageForm({
+        title: "",
+        content: "",
+        type: "announcement",
+        priority: "medium",
+        targetUsers: "all",
+      });
+    } catch (err: any) {
+      setError(err.message || "Failed to send message");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDownloadReport = async (reportType: string) => {
+    try {
+      setActionLoading(reportType);
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/admin/reports/${reportType}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download report");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${reportType}-report-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      setError(err.message || "Failed to download report");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (!user || user.role !== "admin") {
     return (
       <Layout>
