@@ -45,7 +45,10 @@ interface User {
 }
 
 // Convert API user to ChromaGrid item format
-const convertUserToChromaItem = (user: User): ChromaItem => {
+const convertUserToChromaItem = (
+  user: User,
+  navigate: (path: string) => void,
+): ChromaItem => {
   const availabilityText = () => {
     const times = [];
     if (user.availability.weekdays) times.push("Weekdays");
@@ -64,13 +67,14 @@ const convertUserToChromaItem = (user: User): ChromaItem => {
     location: user.location,
     borderColor: "#4F46E5",
     gradient: "linear-gradient(145deg, #4F46E5, #1e293b)",
-    url: `/profile/${user._id}`,
+    url: `/users/${user._id}`,
     rating: 4.5 + Math.random() * 0.5, // Mock rating for now
     reviews: Math.floor(Math.random() * 50) + 5,
     isOnline: Math.random() > 0.5,
     skillsOffered: user.skillsOffered.map((s) => s.skill),
     skillsWanted: user.skillsWanted.map((s) => s.skill),
     availability: availabilityText(),
+    onClick: () => navigate(`/users/${user._id}`), // Add click handler
   };
 };
 
