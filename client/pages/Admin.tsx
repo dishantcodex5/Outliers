@@ -171,45 +171,85 @@ export default function Admin() {
           return;
         }
 
-        // Fetch stats, users, activity, skills, and swaps in parallel
-        const [statsRes, usersRes, activityRes, skillsRes, swapsRes] =
-          await Promise.all([
-            fetch("/api/admin/stats", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch(`/api/admin/users?page=${currentPage}&search=${searchTerm}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch("/api/admin/activity", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch("/api/admin/skills/pending", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch("/api/admin/swaps", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-          ]);
+        // Fetch core admin data first
+        const corePromises = [
+          fetch("/api/admin/stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`/api/admin/users?page=${currentPage}&search=${searchTerm}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("/api/admin/activity", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ];
 
-        if (!statsRes.ok || !usersRes.ok || !activityRes.ok) {
-          throw new Error("Failed to fetch admin data");
+        const [statsRes, usersRes, activityRes] =
+          await Promise.all(corePromises);
+
+        // Check if we got HTML responses (indicating API routing issues)
+        const statsText = await statsRes.text();
+        const usersText = await usersRes.text();
+        const activityText = await activityRes.text();
+
+        if (
+          statsText.startsWith("<!DOCTYPE") ||
+          usersText.startsWith("<!DOCTYPE") ||
+          activityText.startsWith("<!DOCTYPE")
+        ) {
+          throw new Error(
+            "Admin API endpoints not found. Please check server configuration.",
+          );
         }
 
-        const [statsData, usersData, activityData, skillsData, swapsData] =
-          await Promise.all([
-            statsRes.json(),
-            usersRes.json(),
-            activityRes.json(),
-            skillsRes.ok ? skillsRes.json() : { skills: [] },
-            swapsRes.ok ? swapsRes.json() : { swaps: [] },
-          ]);
+        if (!statsRes.ok || !usersRes.ok || !activityRes.ok) {
+          throw new Error(
+            `Failed to fetch admin data: ${statsRes.status}, ${usersRes.status}, ${activityRes.status}`,
+          );
+        }
+
+        // Parse core data
+        const statsData = JSON.parse(statsText);
+        const usersData = JSON.parse(usersText);
+        const activityData = JSON.parse(activityText);
 
         setStats(statsData);
-        setUsers(usersData.users);
-        setTotalPages(usersData.pagination.pages);
-        setActivity(activityData.activity);
-        setSkillSubmissions(skillsData.skills || []);
-        setSwapRequests(swapsData.swaps || []);
+        setUsers(usersData.users || []);
+        setTotalPages(usersData.pagination?.pages || 1);
+        setActivity(activityData.activity || []);
+
+        // Fetch optional data with error handling
+        try {
+          const skillsRes = await fetch("/api/admin/skills/pending", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (skillsRes.ok) {
+            const skillsText = await skillsRes.text();
+            if (!skillsText.startsWith("<!DOCTYPE")) {
+              const skillsData = JSON.parse(skillsText);
+              setSkillSubmissions(skillsData.skills || []);
+            }
+          }
+        } catch (error) {
+          console.warn("Skills endpoint not available:", error);
+          setSkillSubmissions([]);
+        }
+
+        try {
+          const swapsRes = await fetch("/api/admin/swaps", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (swapsRes.ok) {
+            const swapsText = await swapsRes.text();
+            if (!swapsText.startsWith("<!DOCTYPE")) {
+              const swapsData = JSON.parse(swapsText);
+              setSwapRequests(swapsData.swaps || []);
+            }
+          }
+        } catch (error) {
+          console.warn("Swaps endpoint not available:", error);
+          setSwapRequests([]);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to load admin data");
         console.error("Failed to fetch admin data:", err);
