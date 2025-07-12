@@ -63,13 +63,24 @@ export function createServer() {
     },
   );
 
-  // 404 handler
-  app.use("*", (req, res) => {
-    res.status(404).json({
-      error: "Not found",
-      message: `Route ${req.originalUrl} not found`,
+  // Serve static files in production
+  if (process.env.NODE_ENV === "production") {
+    const path = require("path");
+    app.use(express.static(path.join(__dirname, "../spa")));
+
+    // SPA fallback for client-side routing
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../spa/index.html"));
     });
-  });
+  } else {
+    // In development, only handle non-API routes with 404 for API calls
+    app.use("/api/*", (req, res) => {
+      res.status(404).json({
+        error: "Not found",
+        message: `API route ${req.originalUrl} not found`,
+      });
+    });
+  }
 
   return app;
 }
