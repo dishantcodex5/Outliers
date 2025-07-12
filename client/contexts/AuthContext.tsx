@@ -186,19 +186,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateUser = async (userData: Partial<User>) => {
     if (!user) return;
 
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
 
-    const updatedUser = {
-      ...user,
-      ...userData,
-      updatedAt: new Date().toISOString(),
-    };
-    setUser(updatedUser);
-    localStorage.setItem(
-      "skillswap_auth",
-      JSON.stringify({ user: updatedUser }),
-    );
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Update failed");
+      }
+
+      // Add avatar if not present
+      const updatedUser = {
+        ...data.user,
+        avatar: data.user.avatar || user.avatar,
+      };
+
+      setUser(updatedUser);
+      localStorage.setItem(
+        "skillswap_auth",
+        JSON.stringify({ user: updatedUser, token }),
+      );
+    } catch (error: any) {
+      throw new Error(error.message || "Update failed");
+    }
   };
 
   const value = {
