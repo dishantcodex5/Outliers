@@ -27,6 +27,17 @@ export async function authenticateToken(
     }
 
     const payload = verifyToken(token);
+
+    // Handle special admin user case
+    if (payload.userId === "admin-user-fixed") {
+      req.user = {
+        id: "admin-user-fixed",
+        email: "admin@skillswap.com",
+        role: "admin",
+      };
+      return next();
+    }
+
     const user = await User.findById(payload.userId).select("-password");
 
     if (!user) {
