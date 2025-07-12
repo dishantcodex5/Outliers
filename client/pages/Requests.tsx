@@ -51,7 +51,7 @@ interface SwapRequest {
   skillWanted: string;
   message: string;
   duration: string;
-  status: "pending" | "accepted" | "rejected";
+  status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
 }
 
@@ -66,11 +66,11 @@ export default function Requests() {
   const [requests, setRequests] = useState<RequestsData>({
     incoming: [],
     outgoing: [],
-    all: [],
+    all: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+    const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
   const [acceptMessage, setAcceptMessage] = useState("");
@@ -84,9 +84,7 @@ export default function Requests() {
 
       try {
         setIsLoading(true);
-        const authData = JSON.parse(
-          localStorage.getItem("skillswap_auth") || "{}",
-        );
+        const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
         const token = authData.token;
 
         if (!token) {
@@ -117,12 +115,10 @@ export default function Requests() {
     fetchRequests();
   }, [user]);
 
-  const handleAcceptRequest = async (requestId: string) => {
+    const handleAcceptRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      const authData = JSON.parse(
-        localStorage.getItem("skillswap_auth") || "{}",
-      );
+      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
       const token = authData.token;
 
       const response = await fetch(`/api/requests/${requestId}/accept`, {
@@ -159,12 +155,10 @@ export default function Requests() {
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
+    const handleRejectRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      const authData = JSON.parse(
-        localStorage.getItem("skillswap_auth") || "{}",
-      );
+      const authData = JSON.parse(localStorage.getItem("skillswap_auth") || "{}");
       const token = authData.token;
 
       const response = await fetch(`/api/requests/${requestId}/reject`, {
@@ -228,7 +222,7 @@ export default function Requests() {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
+                    {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
               Swap Requests
@@ -309,9 +303,23 @@ export default function Requests() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Incoming Requests */}
+                        {/* Incoming Requests */}
             <TabsContent value="incoming" className="space-y-4">
-              {requests.incoming.map((request) => (
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">Loading requests...</span>
+                </div>
+              ) : requests.incoming.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-xl font-medium text-white mb-2">No incoming requests</h3>
+                  <p className="text-gray-400">You don't have any pending incoming requests</p>
+                </div>
+              ) : (
+                requests.incoming.map((request) => (
                 <Card
                   key={request.id}
                   className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
