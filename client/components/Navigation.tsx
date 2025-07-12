@@ -27,13 +27,11 @@ import {
 
 const publicNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
-  { name: "Feedback", path: "/feedback", icon: Star },
 ];
 
 const authenticatedNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
   { name: "Swap Requests", path: "/requests", icon: MessageSquare },
-  { name: "Feedback", path: "/feedback", icon: Star },
 ];
 
 export default function Navigation() {
