@@ -23,17 +23,17 @@ import {
   LogOut,
   Settings,
   ChevronDown,
+  MessageCircle,
 } from "lucide-react";
 
 const publicNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
-  { name: "Feedback", path: "/feedback", icon: Star },
 ];
 
 const authenticatedNavItems = [
   { name: "Browse Skills", path: "/browse", icon: Search },
   { name: "Swap Requests", path: "/requests", icon: MessageSquare },
-  { name: "Feedback", path: "/feedback", icon: Star },
+  { name: "Conversations", path: "/conversations", icon: MessageCircle },
 ];
 
 export default function Navigation() {

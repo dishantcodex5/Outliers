@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import StarBorder from "@/components/ui/StarBorder";
-import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageSquare,
@@ -30,135 +30,129 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
+  Loader2,
 } from "lucide-react";
 
-// Mock data for swap requests
-const mockRequests = {
-  incoming: [
-    {
-      id: "1",
-      from: {
-        name: "Sarah Chen",
-        avatar: "SC",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-        rating: 4.9,
-      },
-      skill: {
-        offering: "UI/UX Design",
-        wanting: "React Development",
-      },
-      message:
-        "Hi! I'd love to learn React from you. I can teach you UI/UX design principles and Figma workflows in return.",
-      date: "2024-01-15",
-      status: "pending",
-      duration: "2 hours per week",
-    },
-    {
-      id: "2",
-      from: {
-        name: "Mike Johnson",
-        avatar: "MJ",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-        rating: 4.7,
-      },
-      skill: {
-        offering: "Digital Marketing",
-        wanting: "Node.js",
-      },
-      message:
-        "I'm looking to build a backend for my startup. Can we exchange marketing knowledge for Node.js tutorials?",
-      date: "2024-01-14",
-      status: "pending",
-      duration: "1 hour per session",
-    },
-  ],
-  outgoing: [
-    {
-      id: "3",
-      to: {
-        name: "Emma Rodriguez",
-        avatar: "ER",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-        rating: 4.8,
-      },
-      skill: {
-        offering: "React Development",
-        wanting: "Photography",
-      },
-      message:
-        "Hi Emma! I saw your photography portfolio and would love to learn composition and lighting techniques. I can help you with React in return.",
-      date: "2024-01-13",
-      status: "pending",
-      duration: "90 minutes per session",
-    },
-    {
-      id: "4",
-      to: {
-        name: "David Kim",
-        avatar: "DK",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
-        rating: 4.6,
-      },
-      skill: {
-        offering: "JavaScript",
-        wanting: "Korean Language",
-      },
-      message:
-        "안녕하세요! I'd like to learn Korean and can teach JavaScript in exchange.",
-      date: "2024-01-12",
-      status: "accepted",
-      duration: "2 hours per week",
-    },
-  ],
-  scheduled: [
-    {
-      id: "5",
-      partner: {
-        name: "Lisa Wang",
-        avatar: "LW",
-        profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
-        rating: 4.9,
-      },
-      skill: {
-        teaching: "Node.js",
-        learning: "Mandarin Chinese",
-      },
-      nextSession: "2024-01-20T15:00:00Z",
-      status: "active",
-      sessionsCompleted: 3,
-      totalSessions: 8,
-    },
-  ],
-};
+interface SwapRequest {
+  _id: string;
+  from: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+  };
+  to: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+  };
+  skillOffered: string;
+  skillWanted: string;
+  message: string;
+  duration: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+}
+
+interface RequestsData {
+  incoming: SwapRequest[];
+  outgoing: SwapRequest[];
+  all: SwapRequest[];
+}
 
 export default function Requests() {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const [requests, setRequests] = useState(mockRequests);
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [requests, setRequests] = useState<RequestsData>({
+    incoming: [],
+    outgoing: [],
+    all: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState<string | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState<string | null>(null);
   const [acceptMessage, setAcceptMessage] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Fetch requests from API
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        const response = await fetch("/api/requests", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch requests");
+        }
+
+        const data = await response.json();
+        setRequests(data.requests);
+      } catch (err: any) {
+        setError(err.message || "Failed to load requests");
+        console.error("Failed to fetch requests:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, [user]);
+
   const handleAcceptRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      // Update request status
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/requests/${requestId}/accept`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ welcomeMessage: acceptMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to accept request");
+      }
+
+      const data = await response.json();
+
+      // Update local state
       setRequests((prev) => ({
         ...prev,
         incoming: prev.incoming.map((req) =>
-          req.id === requestId ? { ...req, status: "accepted" } : req,
+          req._id === requestId ? { ...req, status: "accepted" as const } : req,
         ),
       }));
 
-      // Close dialog
       setShowAcceptDialog(null);
       setAcceptMessage("");
-
-      // Show success notification (would be a toast in real app)
       console.log("Request accepted successfully");
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || "Failed to accept request");
       console.error("Failed to accept request:", error);
     } finally {
       setIsProcessing(false);
@@ -168,21 +162,37 @@ export default function Requests() {
   const handleRejectRequest = async (requestId: string) => {
     setIsProcessing(true);
     try {
-      // Update request status
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch(`/api/requests/${requestId}/reject`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reason: rejectReason }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reject request");
+      }
+
+      // Update local state
       setRequests((prev) => ({
         ...prev,
         incoming: prev.incoming.map((req) =>
-          req.id === requestId ? { ...req, status: "rejected" } : req,
+          req._id === requestId ? { ...req, status: "rejected" as const } : req,
         ),
       }));
 
-      // Close dialog
       setShowRejectDialog(null);
       setRejectReason("");
-
-      // Show success notification
       console.log("Request rejected successfully");
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || "Failed to reject request");
       console.error("Failed to reject request:", error);
     } finally {
       setIsProcessing(false);
@@ -226,6 +236,12 @@ export default function Requests() {
             <p className="text-gray-300">
               Manage your skill exchange requests and active sessions
             </p>
+            {error && (
+              <div className="mt-4 bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <span className="text-red-300 text-sm">{error}</span>
+              </div>
+            )}
           </div>
 
           {/* Quick Stats */}
@@ -255,9 +271,12 @@ export default function Requests() {
             <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-400 mb-1">
-                  {requests.scheduled.length}
+                  {
+                    requests.incoming.filter((r) => r.status === "accepted")
+                      .length
+                  }
                 </div>
-                <p className="text-sm text-gray-400">Active Sessions</p>
+                <p className="text-sm text-gray-400">Accepted Requests</p>
               </CardContent>
             </Card>
             <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
@@ -289,34 +308,189 @@ export default function Requests() {
                 value="active"
                 className="data-[state=active]:bg-primary"
               >
-                Active Sessions ({requests.scheduled.length})
+                Active Sessions (0)
               </TabsTrigger>
             </TabsList>
 
             {/* Incoming Requests */}
             <TabsContent value="incoming" className="space-y-4">
-              {requests.incoming.map((request) => (
-                <Card
-                  key={request.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">
+                    Loading requests...
+                  </span>
+                </div>
+              ) : requests.incoming.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-xl font-medium text-white mb-2">
+                    No incoming requests
+                  </h3>
+                  <p className="text-gray-400">
+                    You don't have any pending incoming requests
+                  </p>
+                </div>
+              ) : (
+                requests.incoming.map((request) => (
+                  <Card
+                    key={request._id}
+                    className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4 flex-1">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={request.from.profilePhoto}
+                              alt={request.from.name}
+                            />
+                            <AvatarFallback className="bg-primary text-white">
+                              {request.from.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-white">
+                                {request.from.name}
+                              </h3>
+                              <Badge className={getStatusColor(request.status)}>
+                                {request.status}
+                              </Badge>
+                            </div>
+
+                            <div className="mb-3">
+                              <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
+                                <span className="text-green-400">
+                                  Offering:
+                                </span>
+                                <span>{request.skillOffered}</span>
+                                <ArrowRight className="w-4 h-4" />
+                                <span className="text-blue-400">Wants:</span>
+                                <span>{request.skillWanted}</span>
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                Duration: {request.duration}
+                              </div>
+                            </div>
+
+                            <p className="text-gray-300 mb-4">
+                              {request.message}
+                            </p>
+
+                            <div className="text-sm text-gray-400">
+                              Requested on{" "}
+                              {new Date(request.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        {request.status === "pending" && (
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setShowRejectDialog(request._id)}
+                              className="border-red-600 text-red-400 hover:bg-red-900/50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Decline
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => setShowAcceptDialog(request._id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Accept
+                            </Button>
+                          </div>
+                        )}
+
+                        {request.status === "accepted" && (
+                          <div className="flex space-x-2">
+                            <Badge className="bg-green-900/50 text-green-300 border-green-600">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Accepted
+                            </Badge>
+                            <Button
+                              size="sm"
+                              onClick={() => navigate("/conversations")}
+                              className="bg-primary hover:bg-primary/80"
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              Chat
+                            </Button>
+                          </div>
+                        )}
+
+                        {request.status === "rejected" && (
+                          <Badge className="bg-red-900/50 text-red-300 border-red-600">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Declined
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+
+            {/* Outgoing Requests */}
+            <TabsContent value="outgoing" className="space-y-4">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">
+                    Loading requests...
+                  </span>
+                </div>
+              ) : requests.outgoing.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Send className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-xl font-medium text-white mb-2">
+                    No outgoing requests
+                  </h3>
+                  <p className="text-gray-400">
+                    You haven't sent any skill exchange requests yet
+                  </p>
+                </div>
+              ) : (
+                requests.outgoing.map((request) => (
+                  <Card
+                    key={request._id}
+                    className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
                         <Avatar className="w-12 h-12">
                           <AvatarImage
-                            src={request.from.profilePicture}
-                            alt={request.from.name}
+                            src={request.to.profilePhoto}
+                            alt={request.to.name}
                           />
                           <AvatarFallback className="bg-primary text-white">
-                            {request.from.avatar}
+                            {request.to.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold text-white">
-                              {request.from.name}
+                              {request.to.name}
                             </h3>
                             <Badge className={getStatusColor(request.status)}>
                               {request.status}
@@ -325,11 +499,13 @@ export default function Requests() {
 
                           <div className="mb-3">
                             <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                              <span className="text-green-400">Offering:</span>
-                              <span>{request.skill.offering}</span>
+                              <span className="text-green-400">
+                                Your Offer:
+                              </span>
+                              <span>{request.skillOffered}</span>
                               <ArrowRight className="w-4 h-4" />
-                              <span className="text-blue-400">Wants:</span>
-                              <span>{request.skill.wanting}</span>
+                              <span className="text-blue-400">You Want:</span>
+                              <span>{request.skillWanted}</span>
                             </div>
                             <div className="text-sm text-gray-400">
                               Duration: {request.duration}
@@ -341,190 +517,30 @@ export default function Requests() {
                           </p>
 
                           <div className="text-sm text-gray-400">
-                            Requested on{" "}
-                            {new Date(request.date).toLocaleDateString()}
+                            Sent on{" "}
+                            {new Date(request.createdAt).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
-
-                      {request.status === "pending" && (
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setShowRejectDialog(request.id)}
-                            className="border-red-600 text-red-400 hover:bg-red-900/50"
-                          >
-                            <X className="w-4 h-4 mr-1" />
-                            Decline
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => setShowAcceptDialog(request.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <Check className="w-4 h-4 mr-1" />
-                            Accept
-                          </Button>
-                        </div>
-                      )}
-
-                      {request.status === "accepted" && (
-                        <div className="flex space-x-2">
-                          <Badge className="bg-green-900/50 text-green-300 border-green-600">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Accepted
-                          </Badge>
-                          <Button
-                            size="sm"
-                            onClick={() => setSelectedChat(request.id)}
-                            className="bg-primary hover:bg-primary/80"
-                          >
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            Chat
-                          </Button>
-                        </div>
-                      )}
-
-                      {request.status === "rejected" && (
-                        <Badge className="bg-red-900/50 text-red-300 border-red-600">
-                          <XCircle className="w-3 h-3 mr-1" />
-                          Declined
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-
-            {/* Outgoing Requests */}
-            <TabsContent value="outgoing" className="space-y-4">
-              {requests.outgoing.map((request) => (
-                <Card
-                  key={request.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={request.to.profilePicture}
-                          alt={request.to.name}
-                        />
-                        <AvatarFallback className="bg-primary text-white">
-                          {request.to.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-white">
-                            {request.to.name}
-                          </h3>
-                          <Badge className={getStatusColor(request.status)}>
-                            {request.status}
-                          </Badge>
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                            <span className="text-green-400">Your Offer:</span>
-                            <span>{request.skill.offering}</span>
-                            <ArrowRight className="w-4 h-4" />
-                            <span className="text-blue-400">You Want:</span>
-                            <span>{request.skill.wanting}</span>
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            Duration: {request.duration}
-                          </div>
-                        </div>
-
-                        <p className="text-gray-300 mb-4">{request.message}</p>
-
-                        <div className="text-sm text-gray-400">
-                          Sent on {new Date(request.date).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </TabsContent>
 
             {/* Active Sessions */}
             <TabsContent value="active" className="space-y-4">
-              {requests.scheduled.map((session) => (
-                <Card
-                  key={session.id}
-                  className="bg-gray-800/90 backdrop-blur-sm border-gray-600"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={session.partner.profilePicture}
-                            alt={session.partner.name}
-                          />
-                          <AvatarFallback className="bg-primary text-white">
-                            {session.partner.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-white">
-                              {session.partner.name}
-                            </h3>
-                            <Badge className={getStatusColor(session.status)}>
-                              Active Exchange
-                            </Badge>
-                          </div>
-
-                          <div className="mb-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
-                              <span className="text-green-400">Teaching:</span>
-                              <span>{session.skill.teaching}</span>
-                              <ArrowRight className="w-4 h-4" />
-                              <span className="text-blue-400">Learning:</span>
-                              <span>{session.skill.learning}</span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                              Progress: {session.sessionsCompleted}/
-                              {session.totalSessions} sessions completed
-                            </div>
-                          </div>
-
-                          <div className="text-sm text-gray-300 mb-4">
-                            <Calendar className="w-4 h-4 inline mr-1" />
-                            Next session:{" "}
-                            {new Date(session.nextSession).toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-gray-600 text-gray-300"
-                        >
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          Message
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-primary hover:bg-primary/80"
-                        >
-                          <Calendar className="w-4 h-4 mr-1" />
-                          Schedule
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-gray-500" />
+                </div>
+                <h3 className="text-xl font-medium text-white mb-2">
+                  Active Sessions Coming Soon
+                </h3>
+                <p className="text-gray-400">
+                  Session scheduling will be available in a future update
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
@@ -639,75 +655,6 @@ export default function Requests() {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Chat Interface */}
-        {selectedChat && user && (
-          <Dialog
-            open={!!selectedChat}
-            onOpenChange={() => setSelectedChat(null)}
-          >
-            <DialogContent className="bg-transparent border-none p-0 max-w-4xl">
-              <DialogHeader className="sr-only">
-                <DialogTitle>Chat with Exchange Partner</DialogTitle>
-              </DialogHeader>
-              <ChatInterface
-                currentUser={{
-                  id: user.id,
-                  name: user.name,
-                  avatar: user.avatar,
-                  profilePhoto: user.profilePhoto,
-                  online: true,
-                }}
-                otherUser={{
-                  id: "other-user",
-                  name: "Sarah Chen",
-                  avatar: "SC",
-                  profilePhoto:
-                    "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-                  online: true,
-                  lastSeen: "5 minutes ago",
-                }}
-                messages={[
-                  {
-                    id: "1",
-                    senderId: "other-user",
-                    content:
-                      "Hi! I'd love to learn React from you. I can teach you UI/UX design principles and Figma workflows in return.",
-                    timestamp: new Date(
-                      Date.now() - 2 * 60 * 60 * 1000,
-                    ).toISOString(),
-                    type: "text",
-                    status: "read",
-                  },
-                  {
-                    id: "2",
-                    senderId: user.id,
-                    content:
-                      "Great! I'm excited to help you learn React. When would be a good time to start our first session?",
-                    timestamp: new Date(
-                      Date.now() - 1 * 60 * 60 * 1000,
-                    ).toISOString(),
-                    type: "text",
-                    status: "read",
-                  },
-                  {
-                    id: "3",
-                    senderId: "other-user",
-                    content:
-                      "How about this Saturday at 2 PM? We could start with React fundamentals and I can show you some design patterns afterward.",
-                    timestamp: new Date(
-                      Date.now() - 30 * 60 * 1000,
-                    ).toISOString(),
-                    type: "text",
-                    status: "read",
-                  },
-                ]}
-                onSendMessage={handleSendMessage}
-                onScheduleSession={handleScheduleSession}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
     </Layout>
   );

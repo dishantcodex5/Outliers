@@ -12,8 +12,10 @@ import Browse from "./pages/Browse";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 import ProfileSetup from "./pages/ProfileSetup";
 import Requests from "./pages/Requests";
+import Conversations from "./pages/Conversations";
 import Feedback from "./pages/Feedback";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -32,6 +34,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/browse" element={<Browse />} />
+      <Route path="/users/:userId" element={<UserProfile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route
@@ -55,6 +58,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Requests />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/conversations"
+        element={
+          <ProtectedRoute>
+            <Conversations />
           </ProtectedRoute>
         }
       />

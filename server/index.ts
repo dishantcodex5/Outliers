@@ -6,6 +6,7 @@ import { userRoutes } from "./routes/users";
 import { requestRoutes } from "./routes/requests";
 import { conversationRoutes } from "./routes/conversations";
 import { skillRoutes } from "./routes/skills";
+import { adminRoutes } from "./routes/admin";
 import { handleDemo } from "./routes/demo";
 import { checkDatabaseConnection } from "./middleware/database";
 
@@ -37,6 +38,7 @@ export function createServer() {
   app.use("/api/requests", checkDatabaseConnection, requestRoutes);
   app.use("/api/conversations", checkDatabaseConnection, conversationRoutes);
   app.use("/api/skills", checkDatabaseConnection, skillRoutes);
+  app.use("/api/admin", checkDatabaseConnection, adminRoutes);
 
   // Legacy routes
   app.get("/api/ping", (_req, res) => {
@@ -63,13 +65,17 @@ export function createServer() {
     },
   );
 
-  // 404 handler
-  app.use("*", (req, res) => {
-    res.status(404).json({
-      error: "Not found",
-      message: `Route ${req.originalUrl} not found`,
+  // Production: serve static files and handle SPA routing
+  if (process.env.NODE_ENV === "production") {
+    const path = require("path");
+    app.use(express.static(path.join(__dirname, "../spa")));
+
+    // SPA fallback for client-side routing
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../spa/index.html"));
     });
-  });
+  }
+  // Development: Let Vite handle all non-API routes, no catch-all needed
 
   return app;
 }

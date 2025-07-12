@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,50 +37,155 @@ import {
   BarChart3,
   BookOpen,
   Trophy,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
-// Mock additional data not in user schema
-const mockStats = {
-  rating: 4.8,
-  completedExchanges: 24,
-  profileCompleteness: 85,
-};
+interface ProfileStats {
+  rating: number;
+  completedExchanges: number;
+  profileCompleteness: number;
+  requestsReceived: number;
+  requestsSent: number;
+}
 
-const recentActivity = [
-  {
-    type: "completed",
-    title: "React Hooks session with Sarah",
-    date: "2 days ago",
-  },
-  {
-    type: "upcoming",
-    title: "Node.js basics with Mike",
-    date: "Tomorrow, 3 PM",
-  },
-  {
-    type: "completed",
-    title: "Spanish conversation with Maria",
-    date: "1 week ago",
-  },
-];
+interface Activity {
+  type: "completed" | "upcoming" | "request";
+  title: string;
+  date: string;
+  id?: string;
+}
 
-const achievements = [
-  {
-    title: "First Exchange",
-    description: "Completed your first skill exchange",
-    earned: true,
-  },
-  { title: "Teacher", description: "Taught 10+ sessions", earned: true },
-  { title: "Student", description: "Learned 5+ skills", earned: true },
-  { title: "Highly Rated", description: "Maintain 4.5+ rating", earned: true },
-  { title: "Mentor", description: "Teach 25+ sessions", earned: false },
-];
+interface Achievement {
+  title: string;
+  description: string;
+  earned: boolean;
+}
 
 export default function Profile() {
   const { user } = useAuth();
   const [localUser, setLocalUser] = useState(user);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [stats, setStats] = useState<ProfileStats>({
+    rating: 0,
+    completedExchanges: 0,
+    profileCompleteness: 0,
+    requestsReceived: 0,
+    requestsSent: 0,
+  });
+  const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch profile data from API
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+        const authData = JSON.parse(
+          localStorage.getItem("skillswap_auth") || "{}",
+        );
+        const token = authData.token;
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        // Fetch requests to calculate stats
+        const requestsResponse = await fetch("/api/requests", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (requestsResponse.ok) {
+          const requestsData = await requestsResponse.json();
+          const requests = requestsData.requests;
+
+          // Calculate profile completeness
+          let completeness = 0;
+          if (user.name) completeness += 20;
+          if (user.email) completeness += 10;
+          if (user.location) completeness += 20;
+          if (user.skillsOffered.length > 0) completeness += 25;
+          if (user.skillsWanted.length > 0) completeness += 25;
+
+          // Set stats
+          setStats({
+            rating: 4.5 + Math.random() * 0.5, // Mock rating for now
+            completedExchanges:
+              requests.incoming.filter((r: any) => r.status === "accepted")
+                .length +
+              requests.outgoing.filter((r: any) => r.status === "accepted")
+                .length,
+            profileCompleteness: completeness,
+            requestsReceived: requests.incoming.length,
+            requestsSent: requests.outgoing.length,
+          });
+
+          // Set recent activity from requests
+          const activity: Activity[] = [];
+          requests.incoming.slice(0, 2).forEach((req: any) => {
+            activity.push({
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Received"} exchange request from ${req.from.name}`,
+              date: new Date(req.createdAt).toLocaleDateString(),
+              id: req._id,
+            });
+          });
+          requests.outgoing.slice(0, 1).forEach((req: any) => {
+            activity.push({
+              type: req.status === "accepted" ? "completed" : "request",
+              title: `${req.status === "accepted" ? "Completed" : "Sent"} exchange request to ${req.to.name}`,
+              date: new Date(req.createdAt).toLocaleDateString(),
+              id: req._id,
+            });
+          });
+          setRecentActivity(activity);
+        }
+
+        // Set achievements based on user data
+        const userAchievements: Achievement[] = [
+          {
+            title: "Profile Complete",
+            description: "Complete your profile setup",
+            earned: user.profileCompleted,
+          },
+          {
+            title: "Skill Teacher",
+            description: "Add skills you can teach",
+            earned: user.skillsOffered.length > 0,
+          },
+          {
+            title: "Skill Learner",
+            description: "Add skills you want to learn",
+            earned: user.skillsWanted.length > 0,
+          },
+          {
+            title: "First Exchange",
+            description: "Complete your first skill exchange",
+            earned: false, // Would need session data
+          },
+          {
+            title: "Active Member",
+            description: "Send or receive multiple requests",
+            earned: false, // Will be updated based on requests
+          },
+        ];
+        setAchievements(userAchievements);
+      } catch (err: any) {
+        setError(err.message || "Failed to load profile data");
+        console.error("Failed to fetch profile data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
 
   if (!user || !localUser) {
     return null; // This should not happen due to protected route
@@ -90,31 +195,75 @@ export default function Profile() {
     console.log("Sending message:", content);
   };
 
-  const handleAddTeachingSkill = (skill: {
+  const handleAddTeachingSkill = async (skill: {
     skill: string;
     description: string;
     isApproved?: boolean;
   }) => {
-    const updatedUser = {
-      ...localUser,
-      skillsOffered: [...localUser.skillsOffered, skill],
-    };
-    setLocalUser(updatedUser);
-    // In a real app, this would make an API call to update the user
-    console.log("Added teaching skill:", skill);
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch("/api/users/skills/offered", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(skill),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add teaching skill");
+      }
+
+      const data = await response.json();
+      const updatedUser = {
+        ...localUser,
+        skillsOffered: [...localUser.skillsOffered, data.skill],
+      };
+      setLocalUser(updatedUser);
+    } catch (error: any) {
+      setError(error.message || "Failed to add teaching skill");
+      console.error("Failed to add teaching skill:", error);
+    }
   };
 
-  const handleAddLearningSkill = (skill: {
+  const handleAddLearningSkill = async (skill: {
     skill: string;
     description: string;
   }) => {
-    const updatedUser = {
-      ...localUser,
-      skillsWanted: [...localUser.skillsWanted, skill],
-    };
-    setLocalUser(updatedUser);
-    // In a real app, this would make an API call to update the user
-    console.log("Added learning skill:", skill);
+    try {
+      const authData = JSON.parse(
+        localStorage.getItem("skillswap_auth") || "{}",
+      );
+      const token = authData.token;
+
+      const response = await fetch("/api/users/skills/wanted", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(skill),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add learning skill");
+      }
+
+      const data = await response.json();
+      const updatedUser = {
+        ...localUser,
+        skillsWanted: [...localUser.skillsWanted, data.skill],
+      };
+      setLocalUser(updatedUser);
+    } catch (error: any) {
+      setError(error.message || "Failed to add learning skill");
+      console.error("Failed to add learning skill:", error);
+    }
   };
 
   const getAvailabilityText = () => {
@@ -145,6 +294,12 @@ export default function Profile() {
               Manage your skills, track your progress, and connect with the
               community
             </p>
+            {error && (
+              <div className="mt-4 bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <span className="text-red-300 text-sm">{error}</span>
+              </div>
+            )}
           </div>
 
           {/* Profile Header Card */}
@@ -175,10 +330,10 @@ export default function Profile() {
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {mockStats.rating}
+                        {stats.rating.toFixed(1)}
                       </span>
                       <span className="text-gray-400">
-                        ({mockStats.completedExchanges} exchanges)
+                        ({stats.completedExchanges} exchanges)
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -262,13 +417,10 @@ export default function Profile() {
                     Profile Completeness
                   </span>
                   <span className="text-primary font-semibold">
-                    {mockStats.profileCompleteness}%
+                    {stats.profileCompleteness}%
                   </span>
                 </div>
-                <Progress
-                  value={mockStats.profileCompleteness}
-                  className="h-2"
-                />
+                <Progress value={stats.profileCompleteness} className="h-2" />
                 <p className="text-sm text-gray-400 mt-2">
                   {user.skillsOffered.length === 0 &&
                     "Add skills you can teach. "}
@@ -334,123 +486,138 @@ export default function Profile() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">
-                      {mockStats.completedExchanges}
-                    </div>
-                    <p className="text-gray-400">Total Exchanges</p>
-                  </CardContent>
-                </Card>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-2 text-gray-300">
+                    Loading profile data...
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-primary mb-2">
+                          {stats.completedExchanges}
+                        </div>
+                        <p className="text-gray-400">Total Exchanges</p>
+                      </CardContent>
+                    </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">
-                      {localUser.skillsOffered.length}
-                    </div>
-                    <p className="text-gray-400">Skills Teaching</p>
-                  </CardContent>
-                </Card>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-green-400 mb-2">
+                          {localUser.skillsOffered.length}
+                        </div>
+                        <p className="text-gray-400">Skills Teaching</p>
+                      </CardContent>
+                    </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">
-                      {localUser.skillsWanted.length}
-                    </div>
-                    <p className="text-gray-400">Skills Learning</p>
-                  </CardContent>
-                </Card>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-blue-400 mb-2">
+                          {localUser.skillsWanted.length}
+                        </div>
+                        <p className="text-gray-400">Skills Learning</p>
+                      </CardContent>
+                    </Card>
 
-                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">
-                      {mockStats.rating}
-                    </div>
-                    <p className="text-gray-400">Average Rating</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                <CardHeader>
-                  <CardTitle className="text-white">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <StarBorder as="div" color="#10b981" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("skills")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add New Skill
-                      </Button>
-                    </StarBorder>
-                    <StarBorder as="div" color="#3b82f6" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("messages")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        View Messages
-                      </Button>
-                    </StarBorder>
-                    <StarBorder as="div" color="#8b5cf6" speed="5s">
-                      <Button
-                        onClick={() => setActiveTab("settings")}
-                        className="w-full bg-transparent border-none p-0 h-auto font-medium"
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        Edit Profile
-                      </Button>
-                    </StarBorder>
+                    <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-yellow-400 mb-2">
+                          {stats.rating.toFixed(1)}
+                        </div>
+                        <p className="text-gray-400">Average Rating</p>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardContent>
-              </Card>
 
-              {/* Recent Activity Preview */}
-              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-400" />
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentActivity.slice(0, 3).map((activity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 p-3 bg-gray-700/50 rounded-lg"
-                    >
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          activity.type === "completed"
-                            ? "bg-green-400"
-                            : "bg-blue-400"
-                        }`}
-                      />
-                      <div className="flex-1">
-                        <p className="text-white font-medium">
-                          {activity.title}
-                        </p>
-                        <p className="text-sm text-gray-400">{activity.date}</p>
+                  {/* Quick Actions */}
+                  <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                    <CardHeader>
+                      <CardTitle className="text-white">
+                        Quick Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <StarBorder as="div" color="#10b981" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("skills")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add New Skill
+                          </Button>
+                        </StarBorder>
+                        <StarBorder as="div" color="#3b82f6" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("messages")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            View Messages
+                          </Button>
+                        </StarBorder>
+                        <StarBorder as="div" color="#8b5cf6" speed="5s">
+                          <Button
+                            onClick={() => setActiveTab("settings")}
+                            className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Profile
+                          </Button>
+                        </StarBorder>
                       </div>
-                      {activity.type === "completed" && (
-                        <CheckCircle className="w-5 h-5 text-green-400" />
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab("activity")}
-                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
-                  >
-                    View All Activity
-                  </Button>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+
+                  {/* Recent Activity Preview */}
+                  <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-blue-400" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {recentActivity.slice(0, 3).map((activity, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-4 p-3 bg-gray-700/50 rounded-lg"
+                        >
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              activity.type === "completed"
+                                ? "bg-green-400"
+                                : "bg-blue-400"
+                            }`}
+                          />
+                          <div className="flex-1">
+                            <p className="text-white font-medium">
+                              {activity.title}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              {activity.date}
+                            </p>
+                          </div>
+                          {activity.type === "completed" && (
+                            <CheckCircle className="w-5 h-5 text-green-400" />
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        onClick={() => setActiveTab("activity")}
+                        className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                      >
+                        View All Activity
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </TabsContent>
 
             {/* Skills Tab */}
@@ -655,7 +822,7 @@ export default function Profile() {
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardContent className="p-6 text-center">
                     <div className="text-3xl font-bold text-primary mb-2">
-                      {mockStats.completedExchanges}
+                      {stats.completedExchanges}
                     </div>
                     <p className="text-gray-400">Total Exchanges</p>
                   </CardContent>
@@ -682,7 +849,7 @@ export default function Profile() {
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardContent className="p-6 text-center">
                     <div className="text-3xl font-bold text-yellow-400 mb-2">
-                      {mockStats.rating}
+                      {stats.rating.toFixed(1)}
                     </div>
                     <p className="text-gray-400">Average Rating</p>
                   </CardContent>
