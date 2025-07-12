@@ -163,7 +163,12 @@ export default function Signup() {
               </div>
 
               <div className="pt-4">
-                <StarBorder className="w-full" color="#60a5fa" speed="5s">
+                <StarBorder
+                  as="div"
+                  className="w-full"
+                  color="#60a5fa"
+                  speed="5s"
+                >
                   <Button
                     type="submit"
                     disabled={isLoading}
