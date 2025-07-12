@@ -1,21 +1,40 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import StarBorder from "@/components/ui/StarBorder";
 import Layout from "@/components/Layout";
-import { Mail, Lock, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Mail, Lock, Users, AlertCircle } from "lucide-react";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await login(email, password);
+      navigate("/profile");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fillDemoCredentials = () => {
+    setEmail("alex.thompson@email.com");
+    setPassword("password");
   };
 
   return (
