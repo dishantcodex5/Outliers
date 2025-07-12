@@ -152,7 +152,12 @@ export default function Login() {
                   </div>
                 </div>
 
-                <StarBorder className="w-full" color="#a855f7" speed="4s">
+                <StarBorder
+                  as="div"
+                  className="w-full"
+                  color="#a855f7"
+                  speed="4s"
+                >
                   <Button
                     type="submit"
                     disabled={isLoading}
