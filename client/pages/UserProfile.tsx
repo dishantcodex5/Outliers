@@ -686,7 +686,7 @@ export default function UserProfile() {
 
               <div className="space-y-2">
                 <Label htmlFor="message" className="text-gray-200">
-                  Message *
+                  Message * (minimum 10 characters)
                 </Label>
                 <Textarea
                   id="message"
@@ -698,6 +698,14 @@ export default function UserProfile() {
                   className="bg-gray-700 border-gray-600 text-white resize-none"
                   rows={4}
                 />
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>Character count: {requestForm.message.length}</span>
+                  {requestForm.message.length < 10 && (
+                    <span className="text-red-400">
+                      Need {10 - requestForm.message.length} more characters
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-3 pt-4">
