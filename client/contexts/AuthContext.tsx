@@ -41,6 +41,7 @@ interface AuthContextType {
     email: string;
     password: string;
   }) => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
