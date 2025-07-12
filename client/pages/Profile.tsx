@@ -1,45 +1,407 @@
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StarBorder from "@/components/ui/StarBorder";
-import { User, Settings } from "lucide-react";
+import {
+  User,
+  Edit3,
+  Star,
+  Clock,
+  MapPin,
+  Mail,
+  Phone,
+  Calendar,
+  Award,
+  TrendingUp,
+  MessageSquare,
+  Heart,
+  CheckCircle,
+} from "lucide-react";
+
+// Mock user data
+const userData = {
+  name: "Alex Thompson",
+  email: "alex.thompson@email.com",
+  phone: "+1 (555) 123-4567",
+  location: "San Francisco, CA",
+  joinDate: "January 2024",
+  rating: 4.8,
+  completedExchanges: 24,
+  profileCompleteness: 85,
+  bio: "Full-stack developer with 5+ years of experience. Passionate about teaching and learning new technologies. Love to share knowledge about React, Node.js, and cloud architecture.",
+  avatar: "AT",
+};
+
+const skills = [
+  { name: "React Development", level: 95, category: "Teaching", sessions: 12 },
+  { name: "Node.js", level: 90, category: "Teaching", sessions: 8 },
+  { name: "Spanish Language", level: 85, category: "Teaching", sessions: 6 },
+  { name: "Photography", level: 70, category: "Learning", sessions: 4 },
+  { name: "Graphic Design", level: 60, category: "Learning", sessions: 3 },
+];
+
+const recentActivity = [
+  {
+    type: "completed",
+    title: "React Hooks session with Sarah",
+    date: "2 days ago",
+  },
+  {
+    type: "upcoming",
+    title: "Node.js basics with Mike",
+    date: "Tomorrow, 3 PM",
+  },
+  {
+    type: "completed",
+    title: "Spanish conversation with Maria",
+    date: "1 week ago",
+  },
+];
+
+const achievements = [
+  {
+    title: "First Exchange",
+    description: "Completed your first skill exchange",
+    earned: true,
+  },
+  { title: "Teacher", description: "Taught 10+ sessions", earned: true },
+  { title: "Student", description: "Learned 5+ skills", earned: true },
+  { title: "Highly Rated", description: "Maintain 4.5+ rating", earned: true },
+  { title: "Mentor", description: "Teach 25+ sessions", earned: false },
+];
 
 export default function Profile() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">User Profile</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Profile Dashboard
+            </h1>
             <p className="text-gray-300">
-              Manage your skills, availability, and profile information
+              Manage your skills, track your progress, and connect with the
+              community
             </p>
           </div>
 
-          <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl">
-            <CardHeader className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-skill-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <User className="w-10 h-10 text-white" />
+          {/* Profile Header Card */}
+          <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl mb-8">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary to-skill-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-2xl font-bold text-white">
+                    {userData.avatar}
+                  </span>
+                </div>
+
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                    <h2 className="text-3xl font-bold text-white">
+                      {userData.name}
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                      <span className="text-white font-semibold">
+                        {userData.rating}
+                      </span>
+                      <span className="text-gray-400">
+                        ({userData.completedExchanges} exchanges)
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-gray-300 mb-4 max-w-2xl">{userData.bio}</p>
+
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <Mail className="w-4 h-4" />
+                      {userData.email}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Phone className="w-4 h-4" />
+                      {userData.phone}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {userData.location}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      Joined {userData.joinDate}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <StarBorder color="#60a5fa" speed="5s">
+                    Configure Profile
+                  </StarBorder>
+                  <Button
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </div>
               </div>
-              <CardTitle className="text-2xl text-white">
-                Profile Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <div className="bg-yellow-900/50 border border-yellow-700 rounded-lg p-4 mb-6">
-                <p className="text-yellow-200 font-medium">Under Development</p>
-                <p className="text-yellow-300 text-sm mt-1">
-                  Profile editing features are being built. You'll be able to
-                  manage your skills, availability, and personal information
-                  here.
+
+              {/* Profile Completeness */}
+              <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">
+                    Profile Completeness
+                  </span>
+                  <span className="text-primary font-semibold">
+                    {userData.profileCompleteness}%
+                  </span>
+                </div>
+                <Progress
+                  value={userData.profileCompleteness}
+                  className="h-2"
+                />
+                <p className="text-sm text-gray-400 mt-2">
+                  Complete your profile to get more skill exchange opportunities
                 </p>
               </div>
-              <StarBorder color="#eab308" speed="6s">
-                <Settings className="mr-2 w-4 h-4" />
-                Configure Profile
-              </StarBorder>
             </CardContent>
           </Card>
+
+          {/* Main Content Tabs */}
+          <Tabs defaultValue="skills" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4 bg-gray-800/50 border border-gray-600">
+              <TabsTrigger
+                value="skills"
+                className="data-[state=active]:bg-primary"
+              >
+                My Skills
+              </TabsTrigger>
+              <TabsTrigger
+                value="activity"
+                className="data-[state=active]:bg-primary"
+              >
+                Activity
+              </TabsTrigger>
+              <TabsTrigger
+                value="achievements"
+                className="data-[state=active]:bg-primary"
+              >
+                Achievements
+              </TabsTrigger>
+              <TabsTrigger
+                value="stats"
+                className="data-[state=active]:bg-primary"
+              >
+                Statistics
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Skills Tab */}
+            <TabsContent value="skills" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                      Teaching Skills
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {skills
+                      .filter((skill) => skill.category === "Teaching")
+                      .map((skill, index) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-white font-medium">
+                              {skill.name}
+                            </span>
+                            <Badge
+                              variant="secondary"
+                              className="bg-green-900/50 text-green-300"
+                            >
+                              {skill.sessions} sessions
+                            </Badge>
+                          </div>
+                          <Progress value={skill.level} className="h-2" />
+                          <span className="text-sm text-gray-400">
+                            Expertise: {skill.level}%
+                          </span>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-400" />
+                      Learning Skills
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {skills
+                      .filter((skill) => skill.category === "Learning")
+                      .map((skill, index) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-white font-medium">
+                              {skill.name}
+                            </span>
+                            <Badge
+                              variant="secondary"
+                              className="bg-blue-900/50 text-blue-300"
+                            >
+                              {skill.sessions} sessions
+                            </Badge>
+                          </div>
+                          <Progress value={skill.level} className="h-2" />
+                          <span className="text-sm text-gray-400">
+                            Progress: {skill.level}%
+                          </span>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Activity Tab */}
+            <TabsContent value="activity">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-blue-400" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {recentActivity.map((activity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg"
+                    >
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          activity.type === "completed"
+                            ? "bg-green-400"
+                            : "bg-blue-400"
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <p className="text-white font-medium">
+                          {activity.title}
+                        </p>
+                        <p className="text-sm text-gray-400">{activity.date}</p>
+                      </div>
+                      {activity.type === "completed" && (
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Achievements Tab */}
+            <TabsContent value="achievements">
+              <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Award className="w-5 h-5 text-yellow-400" />
+                    Achievements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {achievements.map((achievement, index) => (
+                      <div
+                        key={index}
+                        className={`p-4 rounded-lg border-2 ${
+                          achievement.earned
+                            ? "bg-yellow-900/20 border-yellow-600"
+                            : "bg-gray-700/50 border-gray-600"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <Award
+                            className={`w-6 h-6 ${
+                              achievement.earned
+                                ? "text-yellow-400"
+                                : "text-gray-500"
+                            }`}
+                          />
+                          <h3
+                            className={`font-semibold ${
+                              achievement.earned
+                                ? "text-yellow-300"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {achievement.title}
+                          </h3>
+                        </div>
+                        <p
+                          className={`text-sm ${
+                            achievement.earned
+                              ? "text-yellow-200"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {achievement.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Statistics Tab */}
+            <TabsContent value="stats">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-primary mb-2">
+                      {userData.completedExchanges}
+                    </div>
+                    <p className="text-gray-400">Total Exchanges</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-green-400 mb-2">
+                      18
+                    </div>
+                    <p className="text-gray-400">Sessions Taught</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-blue-400 mb-2">
+                      6
+                    </div>
+                    <p className="text-gray-400">Sessions Learned</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-yellow-400 mb-2">
+                      {userData.rating}
+                    </div>
+                    <p className="text-gray-400">Average Rating</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </Layout>
