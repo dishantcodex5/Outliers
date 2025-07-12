@@ -665,7 +665,10 @@ export default function UserProfile() {
               <div className="flex gap-3 pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => setShowRequestDialog(false)}
+                  onClick={() => {
+                    setShowRequestDialog(false);
+                    setRequestError(null);
+                  }}
                   className="flex-1 border-gray-600 text-gray-300"
                   disabled={isSubmitting}
                 >
