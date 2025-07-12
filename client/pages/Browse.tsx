@@ -90,6 +90,7 @@ export default function Browse() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Fetch users from API
   useEffect(() => {
@@ -139,8 +140,23 @@ export default function Browse() {
         setUsers(data.users || []);
         setError(null); // Clear any previous errors
       } catch (err: any) {
-        setError(err.message || "Failed to load users");
+        const errorMessage = err.message || "Failed to load users";
+        setError(errorMessage);
         console.error("Failed to fetch users:", err);
+
+        // Auto-retry on certain errors (up to 2 times)
+        if (
+          retryCount < 2 &&
+          (errorMessage.includes("endpoint not found") ||
+            errorMessage.includes("Invalid response"))
+        ) {
+          console.log(`Retrying user fetch (attempt ${retryCount + 1}/2)...`);
+          setRetryCount((prev) => prev + 1);
+          setTimeout(() => {
+            fetchUsers();
+          }, 1000);
+          return;
+        }
       } finally {
         setIsLoading(false);
       }
