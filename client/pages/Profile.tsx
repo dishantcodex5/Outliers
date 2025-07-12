@@ -27,6 +27,11 @@ import {
   Eye,
   EyeOff,
   Plus,
+  Settings,
+  MessageCircle,
+  BarChart3,
+  BookOpen,
+  Trophy,
 } from "lucide-react";
 
 // Mock additional data not in user schema
