@@ -74,10 +74,16 @@ const achievements = [
 export default function Profile() {
   const { user } = useAuth();
   const [localUser, setLocalUser] = useState(user);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
 
   if (!user || !localUser) {
     return null; // This should not happen due to protected route
   }
+
+  const handleSendMessage = (content: string) => {
+    console.log("Sending message:", content);
+  };
 
   const handleAddTeachingSkill = (skill: {
     skill: string;
