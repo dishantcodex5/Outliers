@@ -157,6 +157,40 @@ export default function UserProfile() {
       setIsSubmitting(true);
       setRequestError(null); // Clear any previous request errors
 
+      // Frontend validation before sending
+      if (!requestForm.skillOffered) {
+        setRequestError("Please select a skill you can teach");
+        return;
+      }
+
+      if (!requestForm.skillWanted) {
+        setRequestError("Please select a skill you want to learn");
+        return;
+      }
+
+      if (!requestForm.message || requestForm.message.trim().length < 10) {
+        setRequestError("Please provide a message with at least 10 characters");
+        return;
+      }
+
+      // Check if currentUser has the skill they're offering
+      const hasOfferedSkill = currentUser.skillsOffered?.some(
+        (skill) => skill.skill === requestForm.skillOffered,
+      );
+      if (!hasOfferedSkill) {
+        setRequestError("You don't have the skill you selected to offer");
+        return;
+      }
+
+      // Check if target user has the skill being requested
+      const hasWantedSkill = userData.skillsOffered.some(
+        (skill) => skill.skill === requestForm.skillWanted,
+      );
+      if (!hasWantedSkill) {
+        setRequestError("This user doesn't offer the skill you selected");
+        return;
+      }
+
       const authData = JSON.parse(
         localStorage.getItem("skillswap_auth") || "{}",
       );
@@ -166,6 +200,16 @@ export default function UserProfile() {
         setRequestError("Please log in to send requests");
         return;
       }
+
+      const requestData = {
+        to: userData._id,
+        skillOffered: requestForm.skillOffered,
+        skillWanted: requestForm.skillWanted,
+        message: requestForm.message.trim(),
+        duration: requestForm.duration,
+      };
+
+      console.log("Sending request data:", requestData);
 
       // Add timeout for the request
       const controller = new AbortController();
@@ -177,13 +221,7 @@ export default function UserProfile() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          to: userData._id,
-          skillOffered: requestForm.skillOffered,
-          skillWanted: requestForm.skillWanted,
-          message: requestForm.message,
-          duration: requestForm.duration,
-        }),
+        body: JSON.stringify(requestData),
         signal: controller.signal,
       });
 
