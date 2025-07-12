@@ -102,6 +102,30 @@ router.post(
     try {
       const { email, password } = req.body;
 
+      // Development mode without database - return mock success for any credentials
+      if ((req as any).noDatabaseConnection) {
+        const mockUser = {
+          _id: "dev-user-" + Date.now(),
+          name: "Development User",
+          email: email.toLowerCase(),
+          profilePhoto: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
+          profileCompleted: false,
+          isDevelopmentUser: true,
+        };
+
+        const token = generateToken({
+          userId: mockUser._id,
+          email: mockUser.email,
+        });
+
+        return res.json({
+          message: "Login successful (development mode)",
+          token,
+          user: mockUser,
+          warning: "Running without database - using mock authentication",
+        });
+      }
+
       // Find user
       const user = await User.findOne({ email: email.toLowerCase() });
       if (!user) {
