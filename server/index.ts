@@ -7,6 +7,7 @@ import { requestRoutes } from "./routes/requests";
 import { conversationRoutes } from "./routes/conversations";
 import { skillRoutes } from "./routes/skills";
 import { handleDemo } from "./routes/demo";
+import { checkDatabaseConnection } from "./middleware/database";
 
 export function createServer() {
   const app = express();
