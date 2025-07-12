@@ -1,10 +1,33 @@
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import StarBorder from "@/components/ui/StarBorder";
-import { Users, ArrowRight } from "lucide-react";
+import { Users, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export default function Signup() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+    console.log("Form submitted:", formData);
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -24,17 +47,112 @@ export default function Signup() {
               Create your account and start exchanging skills
             </p>
           </CardHeader>
-          <CardContent className="text-center">
-            <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-4 mb-6">
-              <p className="text-blue-200 font-medium">Coming Soon!</p>
-              <p className="text-blue-300 text-sm mt-1">
-                We're working on the signup form. Check back soon!
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="name"
+                  className="text-gray-200 flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  Full Name
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-primary"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="email"
+                  className="text-gray-200 flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-primary"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-gray-200 flex items-center gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-primary"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-gray-200 flex items-center gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  Confirm Password
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-primary"
+                  required
+                />
+              </div>
+
+              <div className="pt-4">
+                <StarBorder className="w-full" color="#60a5fa" speed="5s">
+                  Create Account
+                </StarBorder>
+              </div>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-400 text-sm">
+                Already have an account?{" "}
+                <a
+                  href="/login"
+                  className="text-primary hover:text-primary/80 transition-colors"
+                >
+                  Sign in
+                </a>
               </p>
             </div>
-            <StarBorder className="w-full" color="#60a5fa" speed="5s">
-              Get Notified
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </StarBorder>
+
+            <div className="mt-4 text-center">
+              <StarBorder className="w-full" color="#a855f7" speed="6s">
+                Get Notified
+              </StarBorder>
+            </div>
           </CardContent>
         </Card>
       </div>
