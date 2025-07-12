@@ -291,6 +291,17 @@ export default function Browse() {
           }, delay);
           return;
         }
+
+        // If all retries failed and it's a network error, use fallback data
+        if (
+          errorMessage.includes("Network error") ||
+          errorMessage.includes("Request timed out")
+        ) {
+          console.log("Using fallback data due to network issues");
+          setUsers(fallbackUsers);
+          setIsOffline(true);
+          setError("Using offline data. Some features may be limited.");
+        }
       } finally {
         setIsLoading(false);
       }
