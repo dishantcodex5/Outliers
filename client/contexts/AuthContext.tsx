@@ -113,17 +113,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Mock authentication - in real app this would call an API
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (email === "alex.thompson@email.com" && password === "password") {
-      setUser(mockUser);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      setUser(data.user);
       localStorage.setItem(
         "skillswap_auth",
-        JSON.stringify({ user: mockUser }),
+        JSON.stringify({ user: data.user, token: data.token }),
       );
-    } else {
-      throw new Error("Invalid credentials");
+    } catch (error: any) {
+      throw new Error(error.message || "Login failed");
     }
   };
 
