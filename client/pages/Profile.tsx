@@ -436,7 +436,7 @@ export default function Profile() {
 
           {/* Profile Header Card */}
           <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl mb-8">
-            <CardContent className="p-8">
+            <CardContent className="p-4 md:p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg border-2 border-primary/20">
                   {localUser.profilePhoto ? (
@@ -571,41 +571,41 @@ export default function Profile() {
             onValueChange={setActiveTab}
             className="space-y-6"
           >
-            <TabsList className="grid w-full grid-cols-5 bg-gray-800/50 border border-gray-600">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-gray-800/50 border border-gray-600">
               <TabsTrigger
                 value="overview"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <BarChart3 className="w-4 h-4 mr-1" />
-                Overview
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger
                 value="skills"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm"
               >
-                <BookOpen className="w-4 h-4 mr-1" />
-                Skills
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Skills</span>
               </TabsTrigger>
               <TabsTrigger
                 value="activity"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-2 md:col-span-1"
               >
-                <Clock className="w-4 h-4 mr-1" />
-                Activity
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Activity</span>
               </TabsTrigger>
               <TabsTrigger
                 value="messages"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1"
               >
-                <MessageCircle className="w-4 h-4 mr-1" />
-                Messages
+                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="data-[state=active]:bg-primary"
+                className="data-[state=active]:bg-primary text-xs sm:text-sm col-span-1"
               >
-                <Settings className="w-4 h-4 mr-1" />
-                Settings
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Settings</span>
               </TabsTrigger>
             </TabsList>
 
@@ -747,7 +747,7 @@ export default function Profile() {
 
             {/* Skills Tab */}
             <TabsContent value="skills" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
