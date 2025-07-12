@@ -1,21 +1,40 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import StarBorder from "@/components/ui/StarBorder";
 import Layout from "@/components/Layout";
-import { Mail, Lock, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Mail, Lock, Users, AlertCircle } from "lucide-react";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await login(email, password);
+      navigate("/profile");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fillDemoCredentials = () => {
+    setEmail("alex.thompson@email.com");
+    setPassword("password");
   };
 
   return (
@@ -41,7 +60,34 @@ export default function Login() {
 
           <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl">
             <CardContent className="p-6">
+              {/* Demo Credentials Banner */}
+              <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-3 mb-6">
+                <p className="text-blue-200 text-sm font-medium mb-2">
+                  Demo Account:
+                </p>
+                <div className="text-xs text-blue-300 space-y-1">
+                  <p>Email: alex.thompson@email.com</p>
+                  <p>Password: password</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={fillDemoCredentials}
+                  className="mt-2 text-xs border-blue-600 text-blue-300 hover:bg-blue-800"
+                >
+                  Use Demo Credentials
+                </Button>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                    <span className="text-red-300 text-sm">{error}</span>
+                  </div>
+                )}
+
                 <div>
                   <label htmlFor="email" className="sr-only">
                     Email address
@@ -106,8 +152,19 @@ export default function Login() {
                   </div>
                 </div>
 
-                <StarBorder className="w-full" color="#a855f7" speed="4s">
-                  Sign In
+                <StarBorder
+                  as="div"
+                  className="w-full"
+                  color="#a855f7"
+                  speed="4s"
+                >
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                  >
+                    {isLoading ? "Signing In..." : "Sign In"}
+                  </Button>
                 </StarBorder>
               </form>
 
