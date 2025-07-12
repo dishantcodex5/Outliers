@@ -4,8 +4,30 @@ interface User {
   id: string;
   name: string;
   email: string;
-  avatar: string;
-  profilePicture?: string;
+  password?: string;
+  location: string;
+  profilePhoto: string;
+  skillsOffered: Array<{
+    skill: string;
+    description: string;
+    isApproved: boolean;
+  }>;
+  skillsWanted: Array<{
+    skill: string;
+    description: string;
+  }>;
+  availability: {
+    weekdays: boolean;
+    weekends: boolean;
+    mornings: boolean;
+    afternoons: boolean;
+    evenings: boolean;
+  };
+  isPublic: boolean;
+  role: "user" | "admin";
+  avatar: string; // Generated from name initials
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AuthContextType {
