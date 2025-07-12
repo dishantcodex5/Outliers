@@ -352,9 +352,20 @@ export default function Admin() {
         body: JSON.stringify(messageForm),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
+      const responseText = await response.text();
+      if (responseText.startsWith("<!DOCTYPE")) {
+        throw new Error("Admin messages API endpoint not found");
       }
+
+      if (!response.ok) {
+        throw new Error(`Failed to send message: ${response.status}`);
+      }
+
+      const result = JSON.parse(responseText);
+
+      // Clear any previous errors and show success
+      setError(null);
+      console.log("✅ Message sent successfully:", result.details || result);
 
       setShowMessageForm(false);
       setMessageForm({
