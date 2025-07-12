@@ -164,7 +164,13 @@ export default function Signup() {
 
               <div className="pt-4">
                 <StarBorder className="w-full" color="#60a5fa" speed="5s">
-                  Create Account
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-transparent border-none p-0 h-auto font-medium"
+                  >
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
                 </StarBorder>
               </div>
             </form>
