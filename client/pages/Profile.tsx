@@ -102,47 +102,93 @@ export default function Profile() {
           <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600 shadow-2xl mb-8">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary to-skill-600 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-2xl font-bold text-white">
-                    {userData.avatar}
-                  </span>
+                <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg border-2 border-primary/20">
+                  {user.profilePhoto ? (
+                    <img
+                      src={user.profilePhoto}
+                      alt={user.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary to-skill-600 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">
+                        {user.avatar}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
                     <h2 className="text-3xl font-bold text-white">
-                      {userData.name}
+                      {user.name}
                     </h2>
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {userData.rating}
+                        {mockStats.rating}
                       </span>
                       <span className="text-gray-400">
-                        ({userData.completedExchanges} exchanges)
+                        ({mockStats.completedExchanges} exchanges)
                       </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {user.role === "admin" && (
+                        <Badge className="bg-red-900/50 text-red-300 border-red-600">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
+                      <Badge
+                        className={
+                          user.isPublic
+                            ? "bg-green-900/50 text-green-300 border-green-600"
+                            : "bg-gray-900/50 text-gray-300 border-gray-600"
+                        }
+                      >
+                        {user.isPublic ? (
+                          <Eye className="w-3 h-3 mr-1" />
+                        ) : (
+                          <EyeOff className="w-3 h-3 mr-1" />
+                        )}
+                        {user.isPublic ? "Public" : "Private"}
+                      </Badge>
                     </div>
                   </div>
 
-                  <p className="text-gray-300 mb-4 max-w-2xl">{userData.bio}</p>
-
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
                     <div className="flex items-center gap-1">
                       <Mail className="w-4 h-4" />
-                      {userData.email}
+                      {user.email}
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Phone className="w-4 h-4" />
-                      {userData.phone}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      {userData.location}
-                    </div>
+                    {user.location && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {user.location}
+                      </div>
+                    )}
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      Joined {userData.joinDate}
+                      Joined{" "}
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : "Recently"}
                     </div>
+                  </div>
+
+                  <div className="bg-gray-700/50 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="text-white font-medium">
+                        Availability
+                      </span>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      {getAvailabilityText()}
+                    </p>
                   </div>
                 </div>
 
