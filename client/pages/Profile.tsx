@@ -330,10 +330,10 @@ export default function Profile() {
                     <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-white font-semibold">
-                        {mockStats.rating}
+                        {stats.rating.toFixed(1)}
                       </span>
                       <span className="text-gray-400">
-                        ({mockStats.completedExchanges} exchanges)
+                        ({stats.completedExchanges} exchanges)
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
