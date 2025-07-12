@@ -49,8 +49,50 @@ const mockUser: User = {
   id: "1",
   name: "Alex Thompson",
   email: "alex.thompson@email.com",
+  location: "San Francisco, CA",
+  profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+  skillsOffered: [
+    {
+      skill: "React Development",
+      description:
+        "Advanced React development including hooks, context, and performance optimization",
+      isApproved: true,
+    },
+    {
+      skill: "Node.js",
+      description:
+        "Backend development with Express, APIs, and database integration",
+      isApproved: true,
+    },
+    {
+      skill: "Spanish Language",
+      description:
+        "Conversational Spanish for beginners and intermediate learners",
+      isApproved: true,
+    },
+  ],
+  skillsWanted: [
+    {
+      skill: "Photography",
+      description: "Portrait and landscape photography techniques",
+    },
+    {
+      skill: "Graphic Design",
+      description: "Logo design and brand identity creation",
+    },
+  ],
+  availability: {
+    weekdays: true,
+    weekends: false,
+    mornings: false,
+    afternoons: true,
+    evenings: true,
+  },
+  isPublic: true,
+  role: "user",
   avatar: "AT",
-  profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-15T12:00:00Z",
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
