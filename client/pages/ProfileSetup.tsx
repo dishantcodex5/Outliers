@@ -645,7 +645,12 @@ export default function ProfileSetup() {
                     Next
                   </Button>
                 ) : (
-                  <StarBorder as="div" color="#60a5fa" speed="5s">
+                  <StarBorder
+                    as="div"
+                    color="#60a5fa"
+                    speed="5s"
+                    disabled={!canProceed() || isLoading}
+                  >
                     <Button
                       onClick={handleSubmit}
                       disabled={!canProceed() || isLoading}
