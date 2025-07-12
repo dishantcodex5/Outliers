@@ -299,7 +299,7 @@ export default function Conversations() {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
                           <div className="relative">
                             <Avatar className="w-12 h-12">
                               <AvatarImage
@@ -364,7 +364,7 @@ export default function Conversations() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                           <div className="text-right">
                             <div className="text-xs text-gray-400">
                               {conversation.messageCount} messages
@@ -392,7 +392,7 @@ export default function Conversations() {
             open={!!selectedConversation}
             onOpenChange={() => setSelectedConversation(null)}
           >
-            <DialogContent className="bg-transparent border-none p-0 max-w-4xl max-h-[90vh]">
+            <DialogContent className="bg-transparent border-none p-0 max-w-[95vw] md:max-w-4xl max-h-[90vh] w-full">
               <DialogHeader className="sr-only">
                 <DialogTitle>Chat Interface</DialogTitle>
               </DialogHeader>
