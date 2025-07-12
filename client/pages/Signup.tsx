@@ -75,6 +75,13 @@ export default function Signup() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <span className="text-red-300 text-sm">{error}</span>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label
                   htmlFor="name"
