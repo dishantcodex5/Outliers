@@ -10,34 +10,52 @@ import {
 } from "@/components/ui/select";
 import ChromaGrid, { ChromaItem } from "@/components/ChromaGrid";
 import Layout from "@/components/Layout";
-import {
-  Search,
-  Filter,
-  Grid3X3,
-  List,
-  Users,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { Search, Filter, Grid3X3, List, Users, Loader2, AlertCircle } from "lucide-react";
 
-// Enhanced user data adapted for ChromaGrid
-const users: ChromaItem[] = [
-  {
-    image: "https://i.pravatar.cc/300?img=1",
-    title: "Alex Thompson",
-    subtitle: "Full Stack Developer",
-    handle: "@alexthompson",
-    location: "San Francisco, CA",
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  location: string;
+  profilePhoto: string;
+  skillsOffered: Array<{ skill: string; description: string; isApproved: boolean }>;
+  skillsWanted: Array<{ skill: string; description: string }>;
+  availability: {
+    weekdays: boolean;
+    weekends: boolean;
+    mornings: boolean;
+    afternoons: boolean;
+    evenings: boolean;
+  };
+  isPublic: boolean;
+  profileCompleted: boolean;
+}
+
+// Convert API user to ChromaGrid item format
+const convertUserToChromaItem = (user: User): ChromaItem => {
+  const availabilityText = () => {
+    const times = [];
+    if (user.availability.weekdays) times.push('Weekdays');
+    if (user.availability.weekends) times.push('Weekends');
+    return times.length > 0 ? times.join(', ') : 'Flexible';
+  };
+
+  return {
+    image: user.profilePhoto,
+    title: user.name,
+    subtitle: user.skillsOffered.length > 0 ? user.skillsOffered[0].skill : 'Skill Exchanger',
+    handle: `@${user.name.toLowerCase().replace(/\s+/g, '')}`,
+    location: user.location,
     borderColor: "#4F46E5",
     gradient: "linear-gradient(145deg, #4F46E5, #1e293b)",
-    url: "https://github.com/alexthompson",
-    rating: 4.9,
-    reviews: 23,
-    isOnline: true,
-    skillsOffered: ["React", "Node.js", "TypeScript", "PostgreSQL"],
-    skillsWanted: ["UI/UX Design", "Figma", "Adobe XD"],
-    availability: "Weekends",
-  },
+    url: `/profile/${user._id}`,
+    rating: 4.5 + Math.random() * 0.5, // Mock rating for now
+    reviews: Math.floor(Math.random() * 50) + 5,
+    isOnline: Math.random() > 0.5,
+    skillsOffered: user.skillsOffered.map(s => s.skill),
+    skillsWanted: user.skillsWanted.map(s => s.skill),
+    availability: availabilityText(),
+  };
   {
     image: "https://i.pravatar.cc/300?img=2",
     title: "Sarah Martinez",
