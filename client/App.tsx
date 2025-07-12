@@ -33,6 +33,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/browse" element={<Browse />} />
+      <Route path="/users/:userId" element={<UserProfile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route
