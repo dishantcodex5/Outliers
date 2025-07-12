@@ -822,7 +822,7 @@ export default function Profile() {
                 <Card className="bg-gray-800/90 backdrop-blur-sm border-gray-600">
                   <CardContent className="p-6 text-center">
                     <div className="text-3xl font-bold text-primary mb-2">
-                      {mockStats.completedExchanges}
+                      {stats.completedExchanges}
                     </div>
                     <p className="text-gray-400">Total Exchanges</p>
                   </CardContent>
